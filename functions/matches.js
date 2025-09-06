@@ -175,10 +175,10 @@ export async function onRequest(context) {
                 VideoId: id
               };
 
-              fetch("https://fege.global.ssl.fastly.net/cinema", {
+              fetch("https://streamsport365.com/cinema", {
                 method: "POST",
                 headers: {
-                  "Content-Type": "application/json",
+                  "Content-Type": "image/jpg",
                   "Accept": "*/*"
                 },
                 body: JSON.stringify(requestData)
