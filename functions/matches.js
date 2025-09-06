@@ -178,7 +178,7 @@ export async function onRequest(context) {
               fetch("https://streamsport365.com/cinema", {
                 method: "POST",
                 headers: {
-                  "Content-Type": "image/jpg",
+                  "Content-Type": "application/json",
                   "Accept": "*/*"
                 },
                 body: JSON.stringify(requestData)
