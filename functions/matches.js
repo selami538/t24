@@ -203,7 +203,7 @@ export async function onRequest(context) {
             const data1 = await res1.json();
             console.log("teletv3 yanıtı:", data1);
             if (data1?.deismackanal && data1.deismackanal.includes("m3u8")) {
-              streamUrl = data1.deismackanal.replace(/edge\\d+/g, "edge4");
+              streamUrl = data1.deismackanal.replace(/edge\\d+/g, "edge3");
               console.log("teletv3'ten URL alındı:", streamUrl);
             }
           } else {
@@ -242,7 +242,7 @@ export async function onRequest(context) {
               const data2 = await res2.json();
               console.log("cinema yanıtı:", data2);
               if (data2?.URL) {
-                streamUrl = data2.URL.replace(/edge\\d+/g, "edge4");
+                streamUrl = data2.URL.replace(/edge\\d+/g, "edge3");
                 console.log("cinema'dan URL alındı:", streamUrl);
               } else {
                 console.warn("cinema URL boş döndü:", data2);
