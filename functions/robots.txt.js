@@ -4,6 +4,9 @@ export async function onRequest(context) {
   const baseUrl = `${url.protocol}//${url.hostname}`;
 
   const content = `
+User-agent: Yandex
+Disallow: /
+
 User-agent: *
 Allow: /
 Sitemap: ${baseUrl}/sitemap.xml
