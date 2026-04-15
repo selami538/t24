@@ -91,6 +91,7 @@ export async function onRequest(context) {
   let countdown = null;
 
   function startMainPlayer(mainUrl) {
+    mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
     const options = {
       source: mainUrl,
       parentId: "#player",
@@ -117,6 +118,7 @@ export async function onRequest(context) {
   }
 
   function startAdThenMain(mainUrl) {
+    mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
     window.mainStreamUrl = mainUrl;
 
     if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
