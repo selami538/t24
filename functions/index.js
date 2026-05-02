@@ -233,6 +233,7 @@ ${
 </div>
 <!-- STYLE LİNK -->
 <link rel="amphtml" href="${amp}">
+<meta name="yandex" content="noindex">
 </head>
 <body>
 
