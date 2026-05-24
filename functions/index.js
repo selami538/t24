@@ -1,127 +1,109 @@
-export async function onRequest(context) {
+export default {
+  async fetch(request, env, ctx) {
+    const url = new URL(request.url);
+    const hostname = url.hostname;
 
-const { request } = context;
-const url = new URL(request.url);
-const hostname = url.hostname;
-
-// --- www ile başlayan domain varsa www'yi kaldırıp yönlendir ---
-if (hostname.startsWith("www.")) {
-    const newHost = hostname.replace(/^www\./, "");
-    const redirectUrl = `${url.protocol}//${newHost}${url.pathname}${url.search}`;
-    return Response.redirect(redirectUrl, 301);
-}
-
-const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
-    return String(parseInt(match) + 1);
-});
-
-const apiUrl = "https://corepanel.pro/api/verirepo.php";
-
-let title = "";
-let description = "";
-let logo = "";
-let logowidth = "";
-let logoheight = "";
-let favicon = "";
-let amp = "";
-let canlisonuc = "";
-let twitter = "";
-let telegram = "";
-let facebook = "";
-let instagram = "";
-let youtube = "";
-let headerapi = "";
-let bodyapi = "";
-let footerapi = "";
-let analyticsapi = "";
-let apilinkcikisi = "";
-let pageskincolor = "";
-let footermetin = "";
-let reklam1 = "";
-let reklam2 = "";
-let reklam3 = "";
-let reklam4 = "";
-let reklam5 = "";
-let reklam6 = "";
-let hrefreklam1 = "";
-let hrefreklam2 = "";
-let hrefreklam4 = "";
-let hrefreklam5 = "";
-let hrefreklam6 = "";
-let hrefpageskin = "";
-let menuler = [];
-let aktifTema = 0;
-
-try {
-    const response = await fetch(apiUrl);
-    const json = await response.json();
-
-    const ayar = json?.ayar || {};
-    const playerlogo = json?.playerlogo || {};
-    
-    // AKTİF TEMA KONTROLÜ
-    aktifTema = parseInt(json?.tema?.tema_sec ?? 0);
-
-    title = ayar.ayar_title || "";
-    description = ayar.ayar_description || "";
-    logo = ayar.ayar_logo || "";
-    logowidth = ayar.logo_genislik || "";
-    logoheight = ayar.logo_height || "";
-    favicon = ayar.ayar_favicon || "";
-    amp = ayar.amp_guncel || "";
-    canlisonuc = playerlogo.iletisim_mesaj || "";
-    twitter = ayar.ayar_twitter || "";
-    telegram = ayar.ayar_telegram || "";
-    facebook = ayar.ayar_facebook || "";
-    instagram = ayar.ayar_instagram || "";
-    youtube = ayar.ayar_youtube || "";
-    headerapi = ayar.ayar_api || "";
-    bodyapi = ayar.ayar_body || "";
-    footerapi = ayar.ayar_footervole || "";
-    analyticsapi = ayar.ayar_analystic || "";
-    apilinkcikisi = ayar.ayar_linkcikis || "";
-    pageskincolor = ayar.ayar_pcolor || "";
-    footermetin = ayar.ayar_footermetin || "";
-    reklam1 = ayar.ayar_reklam1 || "";
-    hrefreklam1 = ayar.ayar_ust || "";
-    reklam2 = ayar.ayar_reklam2 || "";
-    hrefreklam2 = ayar.ayar_alt || "";
-    reklam3 = ayar.ayar_reklam3 || "";
-    hrefpageskin = ayar.ayar_pageskin || "";
-    reklam4 = ayar.ayar_reklamust2 || "";
-    hrefreklam4 = ayar.ayar_ust2 || "";
-    reklam5 = ayar.ayar_reklamalt2 || "";
-    hrefreklam5 = ayar.ayar_alt2 || "";
-    reklam6 = ayar.ayar_reklam4 || "";
-    hrefreklam6 = ayar.ayar_footerlink || "";
-
-    if (Array.isArray(json.menu)) {
-        menuler = json.menu
-            .filter(item => item.menu_durum === "1")
-            .sort((a, b) => Number(a.menu_sira) - Number(b.menu_sira))
-            .map(item => ({
-                ad: item.menu_ad || "",
-                url: item.menu_url || "",
-                icon: item.menu_awesome || ""
-            }));
+    // www yönlendirme
+    if (hostname.startsWith("www.")) {
+      const newHost = hostname.replace(/^www\./, "");
+      return Response.redirect(`${url.protocol}//${newHost}${url.pathname}${url.search}`, 301);
     }
 
-} catch (e) {
-    console.error("API'den veri alınamadı:", e);
-}
+    const apiUrl = "https://corepanel.pro/api/verirepo.php";
+    let aktifTema = 0;
 
-// --- TEMA 1: Volebet v2 → PHP sunucusuna yönlendir ---
-if (aktifTema === 1) {
-    return Response.redirect("https://corepanel.pro" + url.pathname + url.search, 302);
-}
+    try {
+      const response = await fetch(apiUrl);
+      const json = await response.json();
+      aktifTema = parseInt(json?.tema?.tema_sec ?? 0);
+    } catch (e) {
+      console.error("API hatası:", e);
+    }
 
-// --- TEMA 2: SEO → PHP sunucusuna yönlendir ---
-if (aktifTema === 2) {
-    return Response.redirect("https://corepanel.pro" + url.pathname + url.search, 302);
-}
+    // TEMA 0 veya 1 → PHP sunucusuna ilet
+    if (aktifTema === 0 || aktifTema === 1) {
+      const phpRequest = new Request(
+        "http://87.236.19.13" + url.pathname + url.search,
+        {
+          method: request.method,
+          headers: {
+            ...Object.fromEntries(request.headers),
+            "Host": "corepanel.pro"
+          },
+          body: ["GET", "HEAD"].includes(request.method) ? null : request.body
+        }
+      );
+      return fetch(phpRequest);
+    }
 
-// --- TEMA 0: Netspor → Cloudflare Pages çalışır ---
-const html = `
+    // TEMA 2 → season worker'ı çalışır (SEO teması)
+    const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
+      return String(parseInt(match) + 1);
+    });
+
+    let title = "", description = "", logo = "", logowidth = "", logoheight = "";
+    let favicon = "", amp = "", canlisonuc = "", twitter = "", telegram = "";
+    let facebook = "", instagram = "", youtube = "", headerapi = "", bodyapi = "";
+    let footerapi = "", analyticsapi = "", apilinkcikisi = "", pageskincolor = "";
+    let footermetin = "", reklam1 = "", reklam2 = "", reklam3 = "", reklam4 = "";
+    let reklam5 = "", reklam6 = "", hrefreklam1 = "", hrefreklam2 = "";
+    let hrefreklam4 = "", hrefreklam5 = "", hrefreklam6 = "", hrefpageskin = "";
+    let menuler = [];
+
+    try {
+      const response = await fetch(apiUrl);
+      const json = await response.json();
+      const ayar = json?.ayar || {};
+      const playerlogo = json?.playerlogo || {};
+
+      title = ayar.ayar_title || "";
+      description = ayar.ayar_description || "";
+      logo = ayar.ayar_logo || "";
+      logowidth = ayar.logo_genislik || "";
+      logoheight = ayar.logo_height || "";
+      favicon = ayar.ayar_favicon || "";
+      amp = ayar.amp_guncel || "";
+      canlisonuc = playerlogo.iletisim_mesaj || "";
+      twitter = ayar.ayar_twitter || "";
+      telegram = ayar.ayar_telegram || "";
+      facebook = ayar.ayar_facebook || "";
+      instagram = ayar.ayar_instagram || "";
+      youtube = ayar.ayar_youtube || "";
+      headerapi = ayar.ayar_api || "";
+      bodyapi = ayar.ayar_body || "";
+      footerapi = ayar.ayar_footervole || "";
+      analyticsapi = ayar.ayar_analystic || "";
+      apilinkcikisi = ayar.ayar_linkcikis || "";
+      pageskincolor = ayar.ayar_pcolor || "";
+      footermetin = ayar.ayar_footermetin || "";
+      reklam1 = ayar.ayar_reklam1 || "";
+      hrefreklam1 = ayar.ayar_ust || "";
+      reklam2 = ayar.ayar_reklam2 || "";
+      hrefreklam2 = ayar.ayar_alt || "";
+      reklam3 = ayar.ayar_reklam3 || "";
+      hrefpageskin = ayar.ayar_pageskin || "";
+      reklam4 = ayar.ayar_reklamust2 || "";
+      hrefreklam4 = ayar.ayar_ust2 || "";
+      reklam5 = ayar.ayar_reklamalt2 || "";
+      hrefreklam5 = ayar.ayar_alt2 || "";
+      reklam6 = ayar.ayar_reklam4 || "";
+      hrefreklam6 = ayar.ayar_footerlink || "";
+
+      if (Array.isArray(json.menu)) {
+        menuler = json.menu
+          .filter(item => item.menu_durum === "1")
+          .sort((a, b) => Number(a.menu_sira) - Number(b.menu_sira))
+          .map(item => ({
+            ad: item.menu_ad || "",
+            url: item.menu_url || "",
+            icon: item.menu_awesome || ""
+          }));
+      }
+    } catch (e) {
+      console.error("API'den veri alınamadı:", e);
+    }
+
+    const html = `
 <!DOCTYPE html>
 <html lang="tr">
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
@@ -151,22 +133,6 @@ const html = `
 }
 *::-webkit-scrollbar { width: 2px; }
 </style>
-<script>
-var searchUsers = document.querySelector('#search'),
-users = document.querySelectorAll('.single-match show'),
-usersData = document.querySelectorAll('.single-match show'),
-searchVal;
-searchUsers.addEventListener('keydown', function() {
-    searchVal = this.value.toLowerCase();
-    for (var i = 0; i < users.length; i++) {
-        if (!searchVal || usersData[i].textContent.toLowerCase().indexOf(searchVal) > -1) {
-            users[i].style['display'] = 'flex';
-        } else {
-            users[i].style['display'] = 'none';
-        }
-    }
-});
-</script>
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
 <link rel="stylesheet" href="assets/css/jquery.fancybox.min.css" />
 <link rel="stylesheet" href="assets/css/videoplayerb94db94d.css?v=130920202" />
@@ -197,11 +163,9 @@ searchUsers.addEventListener('keydown', function() {
 ${headerapi}
 ${analyticsapi}
 ${hrefpageskin
-    ? `<a href="${hrefpageskin}" target="_blank" rel="noopener" aria-label="Reklam"><div class="sayfa-arka nomobile">`
-    : `<div class="sayfa-arka nomobile">`
+  ? `<a href="${hrefpageskin}" target="_blank" rel="noopener" aria-label="Reklam"><div class="sayfa-arka nomobile"></div></a>`
+  : `<div class="sayfa-arka nomobile"></div>`
 }
-${hrefpageskin ? `</div></a>` : `</div>`}
-</div>
 <link rel="amphtml" href="${amp}">
 <meta name="yandex" content="noindex">
 </head>
@@ -277,7 +241,6 @@ ${reklam4 ? `<div style="margin: 10px; text-align: center;">${hrefreklam4 ? `<a 
 <div id="real-matches" class="real-matches" style="width: 100%;">
 <div class="match-cover" style="width: 100%;">
 <div class="match-tab-box" style="display: block; width: 100%;">
-<style>.kategori-bar { position: sticky; top: 0; z-index: 999; }</style>
 <div style="display: flex; align-items: flex-start; gap: 10px;">
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -398,8 +361,8 @@ ${reklam6 ? `<div style="position:fixed; bottom:0px; left:0; width:100%; text-al
 </body>
 </html>`;
 
-return new Response(html, {
-    headers: { "Content-Type": "text/html; charset=UTF-8" }
-});
-
-}
+    return new Response(html, {
+      headers: { "Content-Type": "text/html; charset=UTF-8" }
+    });
+  }
+};
