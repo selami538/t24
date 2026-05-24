@@ -15,7 +15,7 @@ const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
     return String(parseInt(match) + 1);
 });
 
-const apiUrl = "https://panelseason.corepanel.pro/api/verirepo.php";
+const apiUrl = "https://corepanel.pro/api/verirepo.php";
 
 let title = "";
 let description = "";
