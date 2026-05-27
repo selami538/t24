@@ -10,7 +10,7 @@ if (hostname.startsWith("www.")) {
     return Response.redirect(redirectUrl, 301);
 }
 
-const apiUrl = "http://87.236.19.13/api/verirepo.php";
+const apiUrl = "https://altinoksoft.com/api/verirepo.php";
 let aktifTema = 0;
 
 try {
