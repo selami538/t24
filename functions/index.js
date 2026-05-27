@@ -1,7 +1,5 @@
-export default {
-  async fetch(request, env, ctx) {
-    return new Response("Worker calisiyor!", {
-      headers: { "Content-Type": "text/plain" }
-    });
-  }
-};
+export async function onRequest(context) {
+  return new Response("Worker calisiyor!", {
+    headers: { "Content-Type": "text/plain; charset=UTF-8" }
+  });
+}
