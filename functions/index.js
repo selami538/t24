@@ -1,109 +1,146 @@
+import { getTema3Html } from './tema3.js';
+
 export async function onRequest(context) {
 
-const { request } = context;
-const url = new URL(request.url);
-const hostname = url.hostname;
+  const { request } = context;
+  const url = new URL(request.url);
+  const hostname = url.hostname;
 
-if (hostname.startsWith("www.")) {
+  // www yönlendirme
+  if (hostname.startsWith("www.")) {
     const newHost = hostname.replace(/^www\./, "");
     const redirectUrl = `${url.protocol}//${newHost}${url.pathname}${url.search}`;
     return Response.redirect(redirectUrl, 301);
-}
+  }
 
-const apiUrl = "https://api.altinoksoft.com/api/verirepo.php";
-let aktifTema = 0;
+  const apiUrl = "https://api.altinoksoft.com/api/verirepo.php";
 
-try {
-    const response = await fetch(apiUrl);
-    const json = await response.json();
-    aktifTema = parseInt(json?.tema?.tema_sec ?? 0);
-} catch (e) {
+  // TEK API ÇAĞRISI (eskiden 2 kez çekiliyordu, düzeltildi)
+  let json = {};
+  try {
+    const response = await fetch(apiUrl, {
+      cf: { cacheTtl: 60, cacheEverything: true }
+    });
+    json = await response.json();
+  } catch (e) {
     console.error("API hatası:", e);
-}
+  }
 
-if (aktifTema === 0 || aktifTema === 1) {
+  const aktifTema = parseInt(json?.tema?.tema_sec ?? 0);
+
+  // TEMA 0 veya 1 → PHP'ye yönlendir
+  if (aktifTema === 0 || aktifTema === 1) {
     const phpRequest = new Request(
-        "https://api.altinoksoft.com" + url.pathname + url.search,
-        {
-            method: request.method,
-            headers: {
-                ...Object.fromEntries(request.headers),
-                "Host": "altinoksoft.com"
-            },
-            body: ["GET", "HEAD"].includes(request.method) ? null : request.body
-        }
+      "https://api.altinoksoft.com" + url.pathname + url.search,
+      {
+        method: request.method,
+        headers: {
+          ...Object.fromEntries(request.headers),
+          "Host": "altinoksoft.com"
+        },
+        body: ["GET", "HEAD"].includes(request.method) ? null : request.body
+      }
     );
     return fetch(phpRequest);
-}
+  }
 
-const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
+  // Ortak veriler
+  const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
     return String(parseInt(match) + 1);
-});
+  });
 
-let title = "", description = "", logo = "", logowidth = "", logoheight = "";
-let favicon = "", amp = "", canlisonuc = "", twitter = "", telegram = "";
-let facebook = "", instagram = "", youtube = "", headerapi = "", bodyapi = "";
-let footerapi = "", analyticsapi = "", apilinkcikisi = "", pageskincolor = "";
-let footermetin = "", reklam1 = "", reklam2 = "", reklam3 = "", reklam4 = "";
-let reklam5 = "", reklam6 = "", hrefreklam1 = "", hrefreklam2 = "";
-let hrefreklam4 = "", hrefreklam5 = "", hrefreklam6 = "", hrefpageskin = "";
-let menuler = [];
+  const ayar = json?.ayar || {};
+  const playerlogo = json?.playerlogo || {};
 
-try {
-    const response = await fetch(apiUrl);
-    const json = await response.json();
-    const ayar = json?.ayar || {};
-    const playerlogo = json?.playerlogo || {};
+  const params = {
+    hostname,
+    nextDomain,
+    title:        ayar.ayar_title || "",
+    description:  ayar.ayar_description || "",
+    logo:         ayar.ayar_logo || "",
+    logowidth:    ayar.logo_genislik || "",
+    logoheight:   ayar.logo_height || "",
+    favicon:      ayar.ayar_favicon || "",
+    amp:          ayar.amp_guncel || "",
+    canlisonuc:   playerlogo.iletisim_mesaj || "",
+    twitter:      ayar.ayar_twitter || "",
+    telegram:     ayar.ayar_telegram || "",
+    facebook:     ayar.ayar_facebook || "",
+    instagram:    ayar.ayar_instagram || "",
+    youtube:      ayar.ayar_youtube || "",
+    headerapi:    ayar.ayar_api || "",
+    bodyapi:      ayar.ayar_body || "",
+    footerapi:    ayar.ayar_footervole || "",
+    analyticsapi: ayar.ayar_analystic || "",
+    apilinkcikisi:ayar.ayar_linkcikis || "",
+    pageskincolor:ayar.ayar_pcolor || "",
+    footermetin:  ayar.ayar_footermetin || "",
+    reklam1:      ayar.ayar_reklam1 || "",
+    hrefreklam1:  ayar.ayar_ust || "",
+    reklam2:      ayar.ayar_reklam2 || "",
+    hrefreklam2:  ayar.ayar_alt || "",
+    reklam3:      ayar.ayar_reklam3 || "",
+    hrefpageskin: ayar.ayar_pageskin || "",
+    reklam4:      ayar.ayar_reklamust2 || "",
+    hrefreklam4:  ayar.ayar_ust2 || "",
+    reklam5:      ayar.ayar_reklamalt2 || "",
+    hrefreklam5:  ayar.ayar_alt2 || "",
+    reklam6:      ayar.ayar_reklam4 || "",
+    hrefreklam6:  ayar.ayar_footerlink || "",
+    matchesUrl:   "https://teletv5.top/load/matches.php",
+    channelsUrl:  "https://teletv5.top/load/channels.php",
+    menuler: Array.isArray(json.menu)
+      ? json.menu
+          .filter(item => item.menu_durum === "1")
+          .sort((a, b) => Number(a.menu_sira) - Number(b.menu_sira))
+          .map(item => ({
+            ad:   item.menu_ad || "",
+            url:  item.menu_url || "",
+            icon: item.menu_awesome || ""
+          }))
+      : []
+  };
 
-    title = ayar.ayar_title || "";
-    description = ayar.ayar_description || "";
-    logo = ayar.ayar_logo || "";
-    logowidth = ayar.logo_genislik || "";
-    logoheight = ayar.logo_height || "";
-    favicon = ayar.ayar_favicon || "";
-    amp = ayar.amp_guncel || "";
-    canlisonuc = playerlogo.iletisim_mesaj || "";
-    twitter = ayar.ayar_twitter || "";
-    telegram = ayar.ayar_telegram || "";
-    facebook = ayar.ayar_facebook || "";
-    instagram = ayar.ayar_instagram || "";
-    youtube = ayar.ayar_youtube || "";
-    headerapi = ayar.ayar_api || "";
-    bodyapi = ayar.ayar_body || "";
-    footerapi = ayar.ayar_footervole || "";
-    analyticsapi = ayar.ayar_analystic || "";
-    apilinkcikisi = ayar.ayar_linkcikis || "";
-    pageskincolor = ayar.ayar_pcolor || "";
-    footermetin = ayar.ayar_footermetin || "";
-    reklam1 = ayar.ayar_reklam1 || "";
-    hrefreklam1 = ayar.ayar_ust || "";
-    reklam2 = ayar.ayar_reklam2 || "";
-    hrefreklam2 = ayar.ayar_alt || "";
-    reklam3 = ayar.ayar_reklam3 || "";
-    hrefpageskin = ayar.ayar_pageskin || "";
-    reklam4 = ayar.ayar_reklamust2 || "";
-    hrefreklam4 = ayar.ayar_ust2 || "";
-    reklam5 = ayar.ayar_reklamalt2 || "";
-    hrefreklam5 = ayar.ayar_alt2 || "";
-    reklam6 = ayar.ayar_reklam4 || "";
-    hrefreklam6 = ayar.ayar_footerlink || "";
+  // TEMA 2 → mevcut tema
+  if (aktifTema === 2) {
+    const html = getTema2Html(params);
+    return new Response(html, {
+      headers: { "Content-Type": "text/html; charset=UTF-8" }
+    });
+  }
 
-    if (Array.isArray(json.menu)) {
-        menuler = json.menu
-            .filter(item => item.menu_durum === "1")
-            .sort((a, b) => Number(a.menu_sira) - Number(b.menu_sira))
-            .map(item => ({
-                ad: item.menu_ad || "",
-                url: item.menu_url || "",
-                icon: item.menu_awesome || ""
-            }));
-    }
-} catch (e) {
-    console.error("API'den veri alınamadı:", e);
+  // TEMA 3 → Piabet tarzı yeni tema
+  if (aktifTema === 3) {
+    const html = getTema3Html(params);
+    return new Response(html, {
+      headers: { "Content-Type": "text/html; charset=UTF-8" }
+    });
+  }
+
+  // Fallback → tema 2
+  const html = getTema2Html(params);
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=UTF-8" }
+  });
 }
 
-const html = `
-<!DOCTYPE html>
+// ------------------------------------------------------------
+// Mevcut tema 2 HTML'i burada kalır (index.js içindeki büyük
+// template literal'i buraya taşı), veya ayrı tema2.js yap.
+// En temizi: mevcut HTML bloğunu getTema2Html(params) fonksiyonu
+// olarak wrap et ve export et.
+// ------------------------------------------------------------
+function getTema2Html(params) {
+  const {
+    hostname, nextDomain, title, description, logo, logowidth, logoheight,
+    favicon, amp, canlisonuc, twitter, telegram, facebook, instagram, youtube,
+    headerapi, bodyapi, footerapi, analyticsapi, apilinkcikisi, pageskincolor,
+    footermetin, reklam1, reklam2, reklam3, reklam4, reklam5, reklam6,
+    hrefreklam1, hrefreklam2, hrefreklam4, hrefreklam5, hrefreklam6,
+    hrefpageskin, menuler, matchesUrl, channelsUrl
+  } = params;
+
+  return `<!DOCTYPE html>
 <html lang="tr">
 <head>
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
@@ -127,19 +164,9 @@ const html = `
 <link rel="stylesheet" href="assets/css/Responsive1b94d7944.css?v=124" />
 <link href="https://fonts.googleapis.com/css?family=Rubik:300,400,700&display=swap" rel="stylesheet" />
 <style>
-.container-grid {
-  display: grid;
-  grid-template-columns: calc(650px - 0.5em) calc(375px - 0.5em);
-  gap: 0.5em;
-  align-items: flex-start;
-}
+.container-grid { display: grid; grid-template-columns: calc(650px - 0.5em) calc(375px - 0.5em); gap: 0.5em; align-items: flex-start; }
 *::-webkit-scrollbar { width: 2px; }
-.sayfa-arka {
-  position: fixed; top: 0; left: 0;
-  width: 100%; height: 100%; z-index: -2;
-  background: url(${reklam3}) ${pageskincolor} no-repeat center top fixed;
-  background-size: cover;
-}
+.sayfa-arka { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -2; background: url(${reklam3}) ${pageskincolor} no-repeat center top fixed; background-size: cover; }
 .live-list { border: 1px solid rgba(255,255,255,.1); border-radius: var(--radius); overflow: hidden; }
 .social-area { color: white; }
 .single-match:nth-child(odd) { background: linear-gradient(135deg,transparent,rgba(255,255,255,0.1)); }
@@ -271,7 +298,7 @@ ${apilinkcikisi}
 <script src="assets/js/glide11891189.js?v=13092020"></script>
 <script src="assets/js/main11891189.js?v=13092020"></script>
 <script>
-fetch('https://teletv5.top/load/matches.php')
+fetch('${matchesUrl}')
   .then(r => r.text()).then(data => {
     document.getElementById('matches-content').innerHTML = data;
     function filterMatches(categoryStr) {
@@ -290,7 +317,7 @@ fetch('https://teletv5.top/load/matches.php')
     });
     filterMatches("Futbol,Futbol TR,Football,FutboI,Basketbol,Basketbol TR,BasketboI");
   }).catch(e => console.error(e));
-fetch('https://teletv5.top/load/channels.php')
+fetch('${channelsUrl}')
   .then(r => r.text()).then(data => {
     document.getElementById('channels-content').innerHTML = data;
   }).catch(e => console.error(e));
@@ -298,9 +325,4 @@ fetch('https://teletv5.top/load/channels.php')
 ${reklam6 ? `<div style="position:fixed;bottom:0;left:0;width:100%;text-align:center;z-index:999999;"><div style="position:relative;display:inline-block;max-width:100%;"><span onclick="this.parentNode.parentNode.style.display='none';" style="position:absolute;top:5px;right:5px;background:#49de80;color:black;width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;z-index:2;font-weight:bold;">×</span>${hrefreklam6 ? `<a href="${hrefreklam6}" target="_blank"><img src="${reklam6}" style="max-width:100%;height:auto;display:block;border-radius:6px;"/></a>` : `<img src="${reklam6}" style="max-width:100%;height:auto;display:block;border-radius:6px;"/>`}</div></div>` : ''}
 </body>
 </html>`;
-
-return new Response(html, {
-    headers: { "Content-Type": "text/html; charset=UTF-8" }
-});
-
 }
