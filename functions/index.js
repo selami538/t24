@@ -6,7 +6,6 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const hostname = url.hostname;
 
-  // www yönlendirmesi
   if (hostname.startsWith("www.")) {
     const newHost = hostname.replace(/^www\./, "");
     const redirectUrl = `${url.protocol}//${newHost}${url.pathname}${url.search}`;
@@ -15,7 +14,6 @@ export async function onRequest(context) {
 
   const apiUrl = "https://api.altinoksoft.com/api/verirepo.php";
 
-  // TEK API ÇAĞRISI (eskiden 2 kez çekiliyordu, düzeltildi)
   let json = {};
   try {
     const response = await fetch(apiUrl, {
@@ -28,7 +26,6 @@ export async function onRequest(context) {
 
   const aktifTema = parseInt(json?.tema?.tema_sec ?? 0);
 
-  // TEMA 0 veya 1 → PHP'ye yönlendir
   if (aktifTema === 0 || aktifTema === 1) {
     const phpRequest = new Request(
       "https://api.altinoksoft.com" + url.pathname + url.search,
@@ -44,7 +41,6 @@ export async function onRequest(context) {
     return fetch(phpRequest);
   }
 
-  // Ortak veriler
   const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
     return String(parseInt(match) + 1);
   });
@@ -101,7 +97,6 @@ export async function onRequest(context) {
       : []
   };
 
-  // TEMA 2 → mevcut tema
   if (aktifTema === 2) {
     const html = getTema2Html(params);
     return new Response(html, {
@@ -109,7 +104,6 @@ export async function onRequest(context) {
     });
   }
 
-  // TEMA 3 → Piabet tarzı yeni tema
   if (aktifTema === 3) {
     const html = getTema3Html(params);
     return new Response(html, {
@@ -117,19 +111,12 @@ export async function onRequest(context) {
     });
   }
 
-  // Fallback → tema 2
   const html = getTema2Html(params);
   return new Response(html, {
     headers: { "Content-Type": "text/html; charset=UTF-8" }
   });
 }
 
-// ------------------------------------------------------------
-// Mevcut tema 2 HTML'i burada kalır (index.js içindeki büyük
-// template literal'i buraya taşı), veya ayrı tema2.js yap.
-// En temizi: mevcut HTML bloğunu getTema2Html(params) fonksiyonu
-// olarak wrap et ve export et.
-// ------------------------------------------------------------
 function getTema2Html(params) {
   const {
     hostname, nextDomain, title, description, logo, logowidth, logoheight,
@@ -139,6 +126,33 @@ function getTema2Html(params) {
     hrefreklam1, hrefreklam2, hrefreklam4, hrefreklam5, hrefreklam6,
     hrefpageskin, menuler, matchesUrl, channelsUrl
   } = params;
+
+  const BASE = 'https://piabettv21.live';
+
+  const kanallar = [
+    { ad: "S Sport 1",     img: BASE + "/assets/v5/images/s-sport.webp",        id: "s-sport-1" },
+    { ad: "S Sport 2",     img: BASE + "/assets/v5/images/s-sport-2.webp",       id: "s-sport-2" },
+    { ad: "A SPOR",        img: BASE + "/assets/v5/images/a-spor.webp",          id: "a-spor" },
+    { ad: "SPORSMART",     img: BASE + "/assets/v5/images/spor-smart.webp",      id: "spor-smart" },
+    { ad: "Tivibu Spor 1", img: BASE + "/assets/v5/images/tivibu-spor-1.webp",   id: "tivibu-spor-1" },
+    { ad: "Tivibu Spor 2", img: BASE + "/assets/v5/images/tivibu-spor-2.webp",   id: "tivibu-spor-2" },
+    { ad: "Tivibu Spor 3", img: BASE + "/assets/v5/images/tivibu-spor-3.webp",   id: "tivibu-spor-3" },
+    { ad: "Bein Sports 1", img: BASE + "/assets/v5/images/bein-sports-1.webp",   id: "bein-sports-1" },
+    { ad: "Bein Sports 2", img: BASE + "/assets/v5/images/bein-sports-2.webp",   id: "bein-sports-2" },
+    { ad: "Bein Sports 3", img: BASE + "/assets/v5/images/bein-sports-3.webp",   id: "bein-sports-3" },
+    { ad: "Bein Sports 4", img: BASE + "/assets/v5/images/bein-sports-4.webp",   id: "bein-sports-4" },
+    { ad: "Bein Sports 5", img: BASE + "/assets/v5/images/bein-sports-5.webp",   id: "bein-sports-5" },
+    { ad: "BeIN Max 1",    img: BASE + "/assets/v5/images/bein-sports-max-1.webp", id: "bein-sports-max-1" },
+    { ad: "BeIN Max 2",    img: BASE + "/assets/v5/images/bein-sports-max-2.webp", id: "bein-sports-max-2" },
+    { ad: "TRT Spor",      img: BASE + "/assets/v5/images/trt-spor.webp",        id: "trt-spor" },
+    { ad: "TRT 1",         img: BASE + "/assets/v5/images/trt-1.webp",           id: "trt-1" },
+  ];
+
+  const kanalSliderHTML = kanallar.map(k =>
+    '<div class="t2-kanal-kart" data-kanal="' + k.id + '" onclick="t2KanalSec(\'' + k.id + '\')" title="' + k.ad + '">' +
+    '<img src="' + k.img + '" alt="' + k.ad + '" loading="lazy" onerror="this.style.display=\'none\'"/>' +
+    '</div>'
+  ).join('');
 
   return `<!DOCTYPE html>
 <html lang="tr">
@@ -178,6 +192,18 @@ function getTema2Html(params) {
 .menu-item { width: 20px; height: 30px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
 .menu-item.active { opacity: 1; filter: brightness(1.5); }
 @media screen and (max-width: 600px) { .nomobile { display: none; } }
+/* KANAL SLIDER */
+.t2-channel-area { position: relative; display: flex; align-items: center; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 36px; }
+.t2-channel-inner { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 8px 0; flex: 1; }
+.t2-channel-inner::-webkit-scrollbar { display: none; }
+.t2-kanal-kart { flex-shrink: 0; background: #111520; border: 2px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; min-width: 110px; height: 56px; }
+.t2-kanal-kart:hover { border-color: rgba(255,255,255,0.3); background: #1a1f2e; }
+.t2-kanal-kart.active { border-color: var(--color, #49de80); }
+.t2-kanal-kart img { max-height: 32px; max-width: 90px; width: auto; object-fit: contain; }
+.t2-slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; z-index: 5; transition: all 0.2s; user-select: none; }
+.t2-slider-btn:hover { background: rgba(255,255,255,0.2); }
+.t2-slider-prev { left: 4px; }
+.t2-slider-next { right: 4px; }
 </style>
 ${headerapi}
 ${analyticsapi}
@@ -206,6 +232,14 @@ ${youtube ? `<a href="${youtube}" target="_blank" rel="noopener" aria-label="You
 ${menuler.map(menu => `<li class="blink"><a href="${menu.url}" target="_self"><i class="${menu.icon}"></i><span>${menu.ad}</span></a></li>`).join("")}
 </ul>
 </header>
+
+<!-- KANAL SLIDER -->
+<div class="t2-channel-area">
+  <div class="t2-slider-btn t2-slider-prev" onclick="document.getElementById('t2KanalInner').scrollBy({left:-280,behavior:'smooth'})">&#8249;</div>
+  <div class="t2-channel-inner" id="t2KanalInner">${kanalSliderHTML}</div>
+  <div class="t2-slider-btn t2-slider-next" onclick="document.getElementById('t2KanalInner').scrollBy({left:280,behavior:'smooth'})">&#8250;</div>
+</div>
+
 ${reklam1 ? `<div style="margin:10px;text-align:center;">${hrefreklam1 ? `<a href="${hrefreklam1}" target="_blank"><img class="ads-img" src="${reklam1}" width="100%"/></a>` : `<img class="ads-img" src="${reklam1}" width="100%"/>`}</div>` : ''}
 ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a href="${hrefreklam4}" target="_blank"><img class="ads-img" src="${reklam4}" width="100%"/></a>` : `<img class="ads-img" src="${reklam4}" width="100%"/>`}</div>` : ''}
 <div class="container-grid player-grid">
@@ -274,6 +308,13 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
+function t2KanalSec(id) {
+  document.querySelectorAll('.t2-kanal-kart').forEach(function(k) { k.classList.remove('active'); });
+  var el = document.querySelector('.t2-kanal-kart[data-kanal="' + id + '"]');
+  if (el) el.classList.add('active');
+  var iframe = document.getElementById('macth-video');
+  if (iframe) iframe.src = 'matches?id=' + id;
+}
 </script>
 ${reklam2 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam2 ? `<a href="${hrefreklam2}" target="_blank"><img src="${reklam2}" alt="reklam"/></a>` : `<img src="${reklam2}" alt="reklam"/>`}</div>` : ''}
 ${reklam5 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam5 ? `<a href="${hrefreklam5}" target="_blank"><img src="${reklam5}" alt="reklam"/></a>` : `<img src="${reklam5}" alt="reklam"/>`}</div>` : ''}
