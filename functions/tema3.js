@@ -13,17 +13,22 @@ export function getTema3Html(params) {
   } = params;
 
   const kanallar = [
-    { ad: "S Sport 1",     img: "https://piabettv21.live/assets/v5/images/s-sport.png",      id: "s-sport-1" },
-    { ad: "S Sport 2",     img: "https://piabettv21.live/assets/v5/images/s-sport-2.png",     id: "s-sport-2" },
-    { ad: "A Spor",        img: "https://piabettv21.live/assets/v5/images/a-spor.png",        id: "a-spor" },
-    { ad: "Spor Smart",    img: "https://piabettv21.live/assets/v5/images/spor-smart.png",    id: "spor-smart" },
-    { ad: "Tivibu Spor 1", img: "https://piabettv21.live/assets/v5/images/tivibu-spor-1.png", id: "tivibu-spor-1" },
-    { ad: "Tivibu Spor 2", img: "https://piabettv21.live/assets/v5/images/tivibu-spor-2.png", id: "tivibu-spor-2" },
-    { ad: "Tivibu Spor 3", img: "https://piabettv21.live/assets/v5/images/tivibu-spor-3.png", id: "tivibu-spor-3" },
-    { ad: "Bein Sports 1", img: "https://piabettv21.live/assets/v5/images/bein-sports-1.png", id: "bein-sports-1" },
-    { ad: "Bein Sports 2", img: "https://piabettv21.live/assets/v5/images/bein-sports-2.png", id: "bein-sports-2" },
-    { ad: "Bein Sports 3", img: "https://piabettv21.live/assets/v5/images/bein-sports-3.png", id: "bein-sports-3" },
-    { ad: "Bein Sports 4", img: "https://piabettv21.live/assets/v5/images/bein-sports-4.png", id: "bein-sports-4" },
+    { ad: "S Sport 1",       img: "https://piabettv21.live/assets/v5/images/s-sport.webp",        id: "s-sport-1" },
+    { ad: "S Sport 2",       img: "https://piabettv21.live/assets/v5/images/s-sport-2.webp",       id: "s-sport-2" },
+    { ad: "A Spor",          img: "https://piabettv21.live/assets/v5/images/a-spor.webp",          id: "a-spor" },
+    { ad: "Spor Smart",      img: "https://piabettv21.live/assets/v5/images/spor-smart.webp",      id: "spor-smart" },
+    { ad: "Tivibu Spor 1",   img: "https://piabettv21.live/assets/v5/images/tivibu-spor-1.webp",   id: "tivibu-spor-1" },
+    { ad: "Tivibu Spor 2",   img: "https://piabettv21.live/assets/v5/images/tivibu-spor-2.webp",   id: "tivibu-spor-2" },
+    { ad: "Tivibu Spor 3",   img: "https://piabettv21.live/assets/v5/images/tivibu-spor-3.webp",   id: "tivibu-spor-3" },
+    { ad: "Bein Sports 1",   img: "https://piabettv21.live/assets/v5/images/bein-sports-1.webp",   id: "bein-sports-1" },
+    { ad: "Bein Sports 2",   img: "https://piabettv21.live/assets/v5/images/bein-sports-2.webp",   id: "bein-sports-2" },
+    { ad: "Bein Sports 3",   img: "https://piabettv21.live/assets/v5/images/bein-sports-3.webp",   id: "bein-sports-3" },
+    { ad: "Bein Sports 4",   img: "https://piabettv21.live/assets/v5/images/bein-sports-4.webp",   id: "bein-sports-4" },
+    { ad: "Bein Sports 5",   img: "https://piabettv21.live/assets/v5/images/bein-sports-5.webp",   id: "bein-sports-5" },
+    { ad: "BeIN Max 1",      img: "https://piabettv21.live/assets/v5/images/bein-sports-max-1.webp", id: "bein-sports-max-1" },
+    { ad: "BeIN Max 2",      img: "https://piabettv21.live/assets/v5/images/bein-sports-max-2.webp", id: "bein-sports-max-2" },
+    { ad: "TRT Spor",        img: "https://piabettv21.live/assets/v5/images/trt-spor.webp",        id: "trt-spor" },
+    { ad: "TRT 1",           img: "https://piabettv21.live/assets/v5/images/trt-1.webp",           id: "trt-1" },
   ];
 
   const menuHTML = menuler.map(m =>
@@ -35,9 +40,9 @@ export function getTema3Html(params) {
   ).join('');
 
   const kanalHTML = kanallar.map(k =>
-    '<button class="channel-btn" data-kanal="' + k.id + '" onclick="kanalSec(\'' + k.id + '\')">' +
+    '<div class="kanal-kart' + (k.id === 'bein-sports-1' ? ' active' : '') + '" data-kanal="' + k.id + '" onclick="kanalSec(\'' + k.id + '\')">' +
     '<img src="' + k.img + '" alt="' + k.ad + '" onerror="this.style.display=\'none\'"/>' +
-    k.ad + '</button>'
+    '</div>'
   ).join('');
 
   const rek1HTML = reklam1
@@ -110,12 +115,16 @@ analyticsapi + '\n' +
 'nav a:hover{background:var(--bg-hover);color:var(--text-primary)}\n' +
 '.ads-bar{margin:8px 12px;text-align:center}\n' +
 '.ads-bar img{max-width:100%;border-radius:var(--radius-sm)}\n' +
-'.channels-strip{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:10px 12px;overflow-x:auto;scrollbar-width:none}\n' +
-'.channels-strip::-webkit-scrollbar{display:none}\n' +
-'.channels-inner{display:flex;gap:8px;width:max-content}\n' +
-'.channel-btn{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:6px;white-space:nowrap;color:var(--text-secondary);font-size:12px}\n' +
-'.channel-btn:hover,.channel-btn.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}\n' +
-'.channel-btn img{height:22px;width:auto;object-fit:contain;border-radius:3px}\n' +
+'.channels-wrap{position:relative;background:#0a0d14;border-bottom:2px solid rgba(255,255,255,0.06);padding:0 40px}\n' +
+'.channels-inner{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0}\n' +
+'.channels-inner::-webkit-scrollbar{display:none}\n' +
+'.kanal-kart{flex-shrink:0;background:#111520;border:2px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;min-width:120px;height:60px}\n' +
+'.kanal-kart:hover{border-color:rgba(255,255,255,0.25);background:#1a1f2e}\n' +
+'.kanal-kart.active{border-color:var(--accent);background:#1a1f2e}\n' +
+'.kanal-kart img{max-height:36px;max-width:100px;width:auto;object-fit:contain}\n' +
+'.slider-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:10;transition:all .2s}\n' +
+'.slider-btn:hover{background:var(--accent);border-color:var(--accent);color:#000}\n' +
+'.slider-prev{left:4px}.slider-next{right:4px}\n' +
 '.main-layout{display:grid;grid-template-columns:1fr 360px;gap:12px;padding:12px;max-width:1280px;margin:0 auto;align-items:flex-start}\n' +
 '@media(max-width:900px){.main-layout{grid-template-columns:1fr}.sidebar{order:2}.player-col{order:1}}\n' +
 '.player-wrapper{background:#000;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;position:relative}\n' +
@@ -173,7 +182,11 @@ pageskinHTML + '\n' +
 '<nav>' + menuHTML + '</nav>\n' +
 '</header>\n' +
 rek1HTML + rek4HTML +
-'<div class="channels-strip"><div class="channels-inner">' + kanalHTML + '</div></div>\n' +
+'<div class="channels-wrap">\n' +
+'<button class="slider-btn slider-prev" onclick="sliderKaydir(-1)">&#8249;</button>\n' +
+'<div class="channels-inner" id="kanalSlider">' + kanalHTML + '</div>\n' +
+'<button class="slider-btn slider-next" onclick="sliderKaydir(1)">&#8250;</button>\n' +
+'</div>\n' +
 '<div class="main-layout">\n' +
 '<div class="player-col">\n' +
 '<div class="player-wrapper"><iframe id="macth-video" name="macth-video" src="matches?id=bein-sports-1" allowfullscreen scrolling="no"></iframe></div>\n' +
@@ -208,6 +221,10 @@ apilinkcikisi + '\n' +
 '</footer>\n' +
 rek6HTML +
 '<script>\n' +
+'function sliderKaydir(yon){\n' +
+'  var s=document.getElementById("kanalSlider");\n' +
+'  s.scrollBy({left:yon*280,behavior:"smooth"});\n' +
+'}\n' +
 'function switchTab(tab){\n' +
 '  var isMac=tab==="mac";\n' +
 '  document.getElementById("tab-content-mac").style.display=isMac?"block":"none";\n' +
