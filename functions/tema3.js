@@ -12,262 +12,257 @@ export function getTema3Html(params) {
     matchesUrl, channelsUrl
   } = params;
 
+  const BASE = 'https://piabettv21.live';
+
   const kanallar = [
-    { ad: "S Sport 1",       img: "https://piabettv21.live/assets/v5/images/s-sport.webp",        id: "s-sport-1" },
-    { ad: "S Sport 2",       img: "https://piabettv21.live/assets/v5/images/s-sport-2.webp",       id: "s-sport-2" },
-    { ad: "A Spor",          img: "https://piabettv21.live/assets/v5/images/a-spor.webp",          id: "a-spor" },
-    { ad: "Spor Smart",      img: "https://piabettv21.live/assets/v5/images/spor-smart.webp",      id: "spor-smart" },
-    { ad: "Tivibu Spor 1",   img: "https://piabettv21.live/assets/v5/images/tivibu-spor-1.webp",   id: "tivibu-spor-1" },
-    { ad: "Tivibu Spor 2",   img: "https://piabettv21.live/assets/v5/images/tivibu-spor-2.webp",   id: "tivibu-spor-2" },
-    { ad: "Tivibu Spor 3",   img: "https://piabettv21.live/assets/v5/images/tivibu-spor-3.webp",   id: "tivibu-spor-3" },
-    { ad: "Bein Sports 1",   img: "https://piabettv21.live/assets/v5/images/bein-sports-1.webp",   id: "bein-sports-1" },
-    { ad: "Bein Sports 2",   img: "https://piabettv21.live/assets/v5/images/bein-sports-2.webp",   id: "bein-sports-2" },
-    { ad: "Bein Sports 3",   img: "https://piabettv21.live/assets/v5/images/bein-sports-3.webp",   id: "bein-sports-3" },
-    { ad: "Bein Sports 4",   img: "https://piabettv21.live/assets/v5/images/bein-sports-4.webp",   id: "bein-sports-4" },
-    { ad: "Bein Sports 5",   img: "https://piabettv21.live/assets/v5/images/bein-sports-5.webp",   id: "bein-sports-5" },
-    { ad: "BeIN Max 1",      img: "https://piabettv21.live/assets/v5/images/bein-sports-max-1.webp", id: "bein-sports-max-1" },
-    { ad: "BeIN Max 2",      img: "https://piabettv21.live/assets/v5/images/bein-sports-max-2.webp", id: "bein-sports-max-2" },
-    { ad: "TRT Spor",        img: "https://piabettv21.live/assets/v5/images/trt-spor.webp",        id: "trt-spor" },
-    { ad: "TRT 1",           img: "https://piabettv21.live/assets/v5/images/trt-1.webp",           id: "trt-1" },
+    { ad: "S Sport 1",       img: BASE + "/assets/v5/images/s-sport.webp",        id: "s-sport-1" },
+    { ad: "S Sport 2",       img: BASE + "/assets/v5/images/s-sport-2.webp",       id: "s-sport-2" },
+    { ad: "A SPOR",          img: BASE + "/assets/v5/images/a-spor.webp",          id: "a-spor" },
+    { ad: "SPORSMART",       img: BASE + "/assets/v5/images/spor-smart.webp",      id: "spor-smart" },
+    { ad: "Tivibu Spor 1",   img: BASE + "/assets/v5/images/tivibu-spor-1.webp",   id: "tivibu-spor-1" },
+    { ad: "Tivibu Spor 2",   img: BASE + "/assets/v5/images/tivibu-spor-2.webp",   id: "tivibu-spor-2" },
+    { ad: "Tivibu Spor 3",   img: BASE + "/assets/v5/images/tivibu-spor-3.webp",   id: "tivibu-spor-3" },
+    { ad: "Bein Sports 1",   img: BASE + "/assets/v5/images/bein-sports-1.webp",   id: "bein-sports-1" },
+    { ad: "Bein Sports 2",   img: BASE + "/assets/v5/images/bein-sports-2.webp",   id: "bein-sports-2" },
+    { ad: "Bein Sports 3",   img: BASE + "/assets/v5/images/bein-sports-3.webp",   id: "bein-sports-3" },
+    { ad: "Bein Sports 4",   img: BASE + "/assets/v5/images/bein-sports-4.webp",   id: "bein-sports-4" },
+    { ad: "Bein Sports 5",   img: BASE + "/assets/v5/images/bein-sports-5.webp",   id: "bein-sports-5" },
+    { ad: "BeIN Max 1",      img: BASE + "/assets/v5/images/bein-sports-max-1.webp", id: "bein-sports-max-1" },
+    { ad: "BeIN Max 2",      img: BASE + "/assets/v5/images/bein-sports-max-2.webp", id: "bein-sports-max-2" },
+    { ad: "TRT Spor",        img: BASE + "/assets/v5/images/trt-spor.webp",        id: "trt-spor" },
+    { ad: "TRT 1",           img: BASE + "/assets/v5/images/trt-1.webp",           id: "trt-1" },
   ];
 
   const menuHTML = menuler.map(m =>
-    '<a href="' + m.url + '"><i class="' + m.icon + '"></i> ' + m.ad + '</a>'
+    '<li><a href="' + m.url + '" target="_self"><i class="' + m.icon + '"></i><span>' + m.ad + '</span></a></li>'
   ).join('');
 
   const footerMenuHTML = menuler.map(m =>
-    '<a href="' + m.url + '" rel="noopener">' + m.ad + '</a>'
+    '<a href="' + m.url + '" target="_self">' + m.ad + '</a>'
   ).join('');
 
   const kanalHTML = kanallar.map(k =>
-    '<div class="kanal-kart' + (k.id === 'bein-sports-1' ? ' active' : '') + '" data-kanal="' + k.id + '" onclick="kanalSec(\'' + k.id + '\')">' +
-    '<img src="' + k.img + '" alt="' + k.ad + '" onerror="this.style.display=\'none\'"/>' +
+    '<div class="glide__slide single-channel" data-channel="true" data-stream="' + k.id + '" data-name="' + k.ad + '" title="' + k.ad + ' izle" onclick="kanalSec(\'' + k.id + '\')">' +
+    '<picture><img src="' + k.img + '" alt="' + k.ad + '" loading="lazy"/></picture>' +
     '</div>'
   ).join('');
 
-  const rek1HTML = reklam1
-    ? '<div class="ads-bar">' + (hrefreklam1 ? '<a href="' + hrefreklam1 + '" target="_blank"><img src="' + reklam1 + '" alt="reklam"/></a>' : '<img src="' + reklam1 + '" alt="reklam"/>') + '</div>'
-    : '';
-  const rek4HTML = reklam4
-    ? '<div class="ads-bar">' + (hrefreklam4 ? '<a href="' + hrefreklam4 + '" target="_blank"><img src="' + reklam4 + '" alt="reklam"/></a>' : '<img src="' + reklam4 + '" alt="reklam"/>') + '</div>'
-    : '';
-  const rek2HTML = reklam2
-    ? '<div class="ads-bar">' + (hrefreklam2 ? '<a href="' + hrefreklam2 + '" target="_blank"><img src="' + reklam2 + '" alt="reklam"/></a>' : '<img src="' + reklam2 + '" alt="reklam"/>') + '</div>'
-    : '';
-  const rek5HTML = reklam5
-    ? '<div class="ads-bar">' + (hrefreklam5 ? '<a href="' + hrefreklam5 + '" target="_blank"><img src="' + reklam5 + '" alt="reklam"/></a>' : '<img src="' + reklam5 + '" alt="reklam"/>') + '</div>'
-    : '';
-  const rek6HTML = reklam6
-    ? '<div class="sticky-ad" id="stickyAd"><div class="sticky-ad-inner"><button class="sticky-close" onclick="document.getElementById(\'stickyAd\').style.display=\'none\'">×</button>' +
-      (hrefreklam6 ? '<a href="' + hrefreklam6 + '" target="_blank"><img src="' + reklam6 + '" alt="reklam"/></a>' : '<img src="' + reklam6 + '" alt="reklam"/>') +
-      '</div></div>'
-    : '';
+  const rek1HTML = reklam1 ? '<div style="margin:10px;text-align:center;">' + (hrefreklam1 ? '<a href="' + hrefreklam1 + '" target="_blank"><img src="' + reklam1 + '" width="100%" alt="reklam"/></a>' : '<img src="' + reklam1 + '" width="100%" alt="reklam"/>') + '</div>' : '';
+  const rek4HTML = reklam4 ? '<div style="margin:10px;text-align:center;">' + (hrefreklam4 ? '<a href="' + hrefreklam4 + '" target="_blank"><img src="' + reklam4 + '" width="100%" alt="reklam"/></a>' : '<img src="' + reklam4 + '" width="100%" alt="reklam"/>') + '</div>' : '';
+  const rek2HTML = reklam2 ? '<div style="max-width:100%;margin:0 auto;text-align:center;">' + (hrefreklam2 ? '<a href="' + hrefreklam2 + '" target="_blank"><img src="' + reklam2 + '" alt="reklam"/></a>' : '<img src="' + reklam2 + '" alt="reklam"/>') + '</div>' : '';
+  const rek5HTML = reklam5 ? '<div style="max-width:100%;margin:0 auto;text-align:center;">' + (hrefreklam5 ? '<a href="' + hrefreklam5 + '" target="_blank"><img src="' + reklam5 + '" alt="reklam"/></a>' : '<img src="' + reklam5 + '" alt="reklam"/>') + '</div>' : '';
+  const rek6HTML = reklam6 ? '<div style="position:fixed;bottom:0;left:0;width:100%;text-align:center;z-index:999999;"><div style="position:relative;display:inline-block;max-width:100%;"><span onclick="this.parentNode.parentNode.style.display=\'none\';" style="position:absolute;top:5px;right:5px;background:#49de80;color:black;width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;z-index:2;font-weight:bold;">&times;</span>' + (hrefreklam6 ? '<a href="' + hrefreklam6 + '" target="_blank"><img src="' + reklam6 + '" style="max-width:100%;height:auto;display:block;border-radius:6px;" alt="reklam"/></a>' : '<img src="' + reklam6 + '" style="max-width:100%;height:auto;display:block;border-radius:6px;" alt="reklam"/>') + '</div></div>' : '';
 
   const pageskinHTML = hrefpageskin
-    ? '<a href="' + hrefpageskin + '" target="_blank" rel="noopener"><div class="sayfa-arka nomobile"></div></a>'
-    : '<div class="sayfa-arka nomobile"></div>';
+    ? '<a href="' + hrefpageskin + '" target="_blank" rel="noopener"><div class="sayfa-arka"></div></a>'
+    : '<div class="sayfa-arka"></div>';
 
   const scoreboardHTML = canlisonuc == 0
-    ? '<div class="scoreboard-wrap"><iframe src="https://www.sporx.com/_iframe/mac-merkezi/scoreboard.php"></iframe><div class="scoreboard-cover"></div></div>'
+    ? '<div style="position:relative;width:100%;height:150px;"><iframe src="https://www.sporx.com/_iframe/mac-merkezi/scoreboard.php" width="100%" height="100%" frameborder="0"></iframe><div style="position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999;"></div></div>'
     : '';
 
-  const twHTML = twitter ? '<a href="' + twitter + '" target="_blank" rel="noopener" aria-label="Twitter"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16"><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg></a>' : '';
-  const igHTML = instagram ? '<a href="' + instagram + '" target="_blank" rel="noopener" aria-label="Instagram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16"><path fill="currentColor" d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg></a>' : '';
-  const tgHTML = telegram ? '<a href="' + telegram + '" target="_blank" rel="noopener" aria-label="Telegram"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" width="16" height="16"><path fill="currentColor" d="M446.7 98.6l-67.6 318.8c-5.1 22.5-18.4 28.1-37.3 17.5l-103-75.9-49.7 47.8c-5.5 5.5-10.1 10.1-20.7 10.1l7.4-104.9 190.9-172.5c8.3-7.4-1.8-11.5-12.9-4.1L117.8 284 16.2 252.2c-22.1-6.9-22.5-22.1 4.6-32.7L418.2 66.4c18.4-6.9 34.5 4.1 28.5 32.2z"/></svg></a>' : '';
-  const fbHTML = facebook ? '<a href="' + facebook + '" target="_blank" rel="noopener" aria-label="Facebook"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512" width="16" height="16"><path fill="currentColor" d="M279.14 288l14.22-92.66h-88.91V127.67c0-25.35 12.42-50.06 52.24-50.06h40.42V6.26S263.69 0 225.36 0C141.09 0 89.53 54.42 89.53 153.12v68.22H0V288h89.53v224h107.78V288z"/></svg></a>' : '';
-  const ytHTML = youtube ? '<a href="' + youtube + '" target="_blank" rel="noopener" aria-label="YouTube"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" width="16" height="16"><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.764-42.232-48.339-48.518C456.994 64 288 64 288 64s-168.994 0-213.316 11.565c-23.575 6.286-42.058 24.868-48.339 48.518C16 168.428 16 256 16 256s0 87.572 10.345 131.917c6.281 23.65 24.764 42.232 48.339 48.518C119.006 448 288 448 288 448s168.994 0 213.316-11.565c23.575-6.286 42.058-24.868 48.339-48.518C560 343.572 560 256 560 256s0-87.572-10.345-131.917zM232 336V176l142.857 80L232 336z"/></svg></a>' : '';
+  const twHTML  = twitter   ? '<a href="' + twitter   + '" target="_blank" rel="noopener" aria-label="Twitter"><svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M459.37 151.716c.325 4.548.325 9.097.325 13.645 0 138.72-105.583 298.558-298.558 298.558-59.452 0-114.68-17.219-161.137-47.106 8.447.974 16.568 1.299 25.34 1.299 49.055 0 94.213-16.568 130.274-44.832-46.132-.975-84.792-31.188-98.112-72.772 6.498.974 12.995 1.624 19.818 1.624 9.421 0 18.843-1.3 27.614-3.573-48.081-9.747-84.143-51.98-84.143-102.985v-1.299c13.969 7.797 30.214 12.67 47.431 13.319-28.264-18.843-46.781-51.005-46.781-87.391 0-19.492 5.197-37.36 14.294-52.954 51.655 63.675 129.3 105.258 216.365 109.807-1.624-7.797-2.599-15.918-2.599-24.04 0-57.828 46.782-104.934 104.934-104.934 30.213 0 57.502 12.67 76.67 33.137 23.715-4.548 46.456-13.32 66.599-25.34-7.798 24.366-24.366 44.833-46.132 57.827 21.117-2.273 41.584-8.122 60.426-16.243-14.292 20.791-32.161 39.308-52.628 54.253z"/></svg></a>' : '';
+  const igHTML  = instagram ? '<a href="' + instagram + '" target="_blank" rel="noopener" aria-label="Instagram"><svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="currentColor" d="M14.52,2.469H5.482c-1.664,0-3.013,1.349-3.013,3.013v9.038c0,1.662,1.349,3.012,3.013,3.012h9.038c1.662,0,3.012-1.35,3.012-3.012V5.482C17.531,3.818,16.182,2.469,14.52,2.469 M13.012,4.729h2.26v2.259h-2.26V4.729z M10,6.988c1.664,0,3.012,1.349,3.012,3.012c0,1.664-1.348,3.013-3.012,3.013c-1.664,0-3.012-1.349-3.012-3.013C6.988,8.336,8.336,6.988,10,6.988 M16.025,14.52c0,0.831-0.676,1.506-1.506,1.506H5.482c-0.831,0-1.507-0.675-1.507-1.506V9.247h1.583C5.516,9.494,5.482,9.743,5.482,10c0,2.497,2.023,4.52,4.518,4.52c2.494,0,4.52-2.022,4.52-4.52c0-0.257-0.035-0.506-0.076-0.753h1.582V14.52z"/></svg></a>' : '';
+  const tgHTML  = telegram  ? '<a href="' + telegram  + '" target="_blank" rel="noopener" aria-label="Telegram"><svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><path fill="currentColor" d="M446.7 98.6l-67.6 318.8c-5.1 22.5-18.4 28.1-37.3 17.5l-103-75.9-49.7 47.8c-5.5 5.5-10.1 10.1-20.7 10.1l7.4-104.9 190.9-172.5c8.3-7.4-1.8-11.5-12.9-4.1L117.8 284 16.2 252.2c-22.1-6.9-22.5-22.1 4.6-32.7L418.2 66.4c18.4-6.9 34.5 4.1 28.5 32.2z"/></svg></a>' : '';
+  const fbHTML  = facebook  ? '<a href="' + facebook  + '" target="_blank" rel="noopener" aria-label="Facebook"><svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path fill="currentColor" d="M11.344,5.71c0-0.73,0.074-1.122,1.199-1.122h1.502V1.871h-2.404c-2.886,0-3.903,1.36-3.903,3.646v1.765h-1.8V10h1.8v8.128h3.601V10h2.403l0.32-2.718h-2.724L11.344,5.71z"/></svg></a>' : '';
+  const ytHTML  = youtube   ? '<a href="' + youtube   + '" target="_blank" rel="noopener" aria-label="YouTube"><svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512"><path fill="currentColor" d="M549.655 124.083c-6.281-23.65-24.764-42.232-48.339-48.518C456.994 64 288 64 288 64s-168.994 0-213.316 11.565c-23.575 6.286-42.058 24.868-48.339 48.518C16 168.428 16 256 16 256s0 87.572 10.345 131.917c6.281 23.65 24.764 42.232 48.339 48.518C119.006 448 288 448 288 448s168.994 0 213.316-11.565c23.575-6.286 42.058-24.868 48.339-48.518C560 343.572 560 256 560 256s0-87.572-10.345-131.917zM232 336V176l142.857 80L232 336z"/></svg></a>' : '';
 
   const mUrl = matchesUrl || 'https://teletv5.top/load/matches.php';
   const cUrl = channelsUrl || 'https://teletv5.top/load/channels.php';
 
-  return '<!DOCTYPE html>\n' +
-'<html lang="tr">\n' +
-'<head>\n' +
-'<meta http-equiv="content-type" content="text/html;charset=UTF-8"/>\n' +
-'<meta charset="utf-8">\n' +
-'<meta content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" name="viewport"/>\n' +
-'<title>' + title + '</title>\n' +
-'<meta name="description" content="' + description + '"/>\n' +
-'<meta property="og:title" content="' + title + '"/>\n' +
-'<meta property="og:description" content="' + description + '"/>\n' +
-'<meta property="og:type" content="website"/>\n' +
-'<link rel="shortcut icon" href="' + favicon + '" type="image/x-icon"/>\n' +
-'<link rel="amphtml" href="' + amp + '">\n' +
-'<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>\n' +
-'<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>\n' +
-headerapi + '\n' +
-analyticsapi + '\n' +
-'<style>\n' +
-'*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}\n' +
-':root{--bg-primary:#0f1117;--bg-secondary:#1a1d27;--bg-card:#1e2230;--bg-hover:#252a3a;--accent:#f5a623;--accent2:#e8415a;--text-primary:#ffffff;--text-secondary:#a0a8c0;--text-muted:#6b7280;--border:rgba(255,255,255,0.08);--radius:10px;--radius-sm:6px}\n' +
-'html,body{background:var(--bg-primary);color:var(--text-primary);font-family:Inter,sans-serif;min-height:100vh}\n' +
-'.sayfa-arka{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;background:url(' + reklam3 + ') ' + pageskincolor + ' no-repeat center top fixed;background-size:cover}\n' +
-'@media(max-width:768px){.sayfa-arka,.nomobile{display:none}}\n' +
-'.top-bar{background:var(--accent2);padding:6px 16px;display:flex;justify-content:space-between;align-items:center;font-size:12px;flex-wrap:wrap;gap:6px}\n' +
-'.top-bar a{color:#fff;text-decoration:none;font-weight:600}\n' +
-'.social-icons{display:flex;gap:10px;align-items:center}\n' +
-'.social-icons a{color:#fff;opacity:.85;transition:opacity .2s}\n' +
-'.social-icons a:hover{opacity:1}\n' +
-'header{background:var(--bg-secondary);border-bottom:1px solid var(--border);padding:10px 16px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}\n' +
-'.header-logo img{height:40px;width:auto;object-fit:contain}\n' +
-'nav{display:flex;gap:4px;flex-wrap:wrap;flex:1}\n' +
-'nav a{color:var(--text-secondary);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:var(--radius-sm);transition:all .2s;white-space:nowrap}\n' +
-'nav a:hover{background:var(--bg-hover);color:var(--text-primary)}\n' +
-'.ads-bar{margin:8px 12px;text-align:center}\n' +
-'.ads-bar img{max-width:100%;border-radius:var(--radius-sm)}\n' +
-'.channels-wrap{position:relative;background:#0a0d14;border-bottom:2px solid rgba(255,255,255,0.06);padding:0 40px}\n' +
-'.channels-inner{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 0}\n' +
-'.channels-inner::-webkit-scrollbar{display:none}\n' +
-'.kanal-kart{flex-shrink:0;background:#111520;border:2px solid rgba(255,255,255,0.08);border-radius:8px;padding:10px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;min-width:120px;height:60px}\n' +
-'.kanal-kart:hover{border-color:rgba(255,255,255,0.25);background:#1a1f2e}\n' +
-'.kanal-kart.active{border-color:var(--accent);background:#1a1f2e}\n' +
-'.kanal-kart img{max-height:36px;max-width:100px;width:auto;object-fit:contain}\n' +
-'.slider-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,0.7);border:1px solid rgba(255,255,255,0.1);color:#fff;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;z-index:10;transition:all .2s}\n' +
-'.slider-btn:hover{background:var(--accent);border-color:var(--accent);color:#000}\n' +
-'.slider-prev{left:4px}.slider-next{right:4px}\n' +
-'.main-layout{display:grid;grid-template-columns:1fr 360px;gap:12px;padding:12px;max-width:1280px;margin:0 auto;align-items:flex-start}\n' +
-'@media(max-width:900px){.main-layout{grid-template-columns:1fr}.sidebar{order:2}.player-col{order:1}}\n' +
-'.player-wrapper{background:#000;border-radius:var(--radius);overflow:hidden;aspect-ratio:16/9;position:relative}\n' +
-'.player-wrapper iframe{width:100%;height:100%;border:none;display:block}\n' +
-'.sidebar-box{background:var(--bg-secondary);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden}\n' +
-'.tab-bar{display:flex;border-bottom:1px solid var(--border)}\n' +
-'.tab-btn{flex:1;padding:11px;text-align:center;cursor:pointer;font-size:13px;font-weight:500;color:var(--text-secondary);border-bottom:2px solid transparent;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:6px}\n' +
-'.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}\n' +
-'.blink-dot{width:7px;height:7px;background:#e8415a;border-radius:50%;animation:blink 1.2s infinite}\n' +
-'@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}\n' +
-'.search-wrap{padding:8px;border-bottom:1px solid var(--border);position:relative}\n' +
-'.search-wrap input{width:100%;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 34px 7px 10px;color:var(--text-primary);font-size:13px;outline:none}\n' +
-'.search-wrap input::placeholder{color:var(--text-muted)}\n' +
-'.search-wrap .s-icon{position:absolute;right:18px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px;pointer-events:none}\n' +
-'.sport-filter{display:flex;gap:4px;padding:6px 8px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}\n' +
-'.sport-filter::-webkit-scrollbar{display:none}\n' +
-'.sport-btn{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--text-secondary);cursor:pointer;white-space:nowrap;transition:all .2s}\n' +
-'.sport-btn:hover,.sport-btn.active{background:var(--accent);border-color:var(--accent);color:#000;font-weight:600}\n' +
-'.matches-scroll{max-height:520px;overflow-y:auto;scrollbar-width:thin;scrollbar-color:var(--border) transparent}\n' +
-'#matchList a.single-match,#matches-content a.single-match{display:flex;align-items:center;gap:8px;padding:8px 10px;text-decoration:none;color:var(--text-primary);border-bottom:1px solid var(--border);transition:background .15s;cursor:pointer}\n' +
-'#matchList a.single-match:hover,#matches-content a.single-match:hover{background:var(--bg-hover)}\n' +
-'#matchList a.single-match:nth-child(odd),#matches-content a.single-match:nth-child(odd){background:rgba(255,255,255,0.03)}\n' +
-'.single-match .match-detail{flex:1;min-width:0}\n' +
-'.single-match .match-detail .date{font-size:10px;color:var(--accent);font-weight:600;text-transform:uppercase;margin-bottom:1px}\n' +
-'.single-match .match-detail .event{font-size:10px;color:var(--text-muted);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n' +
-'.single-match .match-detail .teams{display:flex;flex-direction:column;gap:1px}\n' +
-'.single-match .match-detail .teams .home,.single-match .match-detail .teams .away{font-size:12px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}\n' +
-'.single-match .match-detail .teams .away{color:var(--text-secondary)}\n' +
-'.single-match img{width:20px;height:20px;object-fit:contain;flex-shrink:0;border-radius:2px}\n' +
-'#channels-content a.single-match{display:flex;align-items:center;gap:10px;padding:10px;text-decoration:none;color:var(--text-primary);border-bottom:1px solid var(--border);transition:background .15s}\n' +
-'#channels-content a.single-match:hover{background:var(--bg-hover)}\n' +
-'footer{background:var(--bg-secondary);border-top:1px solid var(--border);margin-top:20px;padding:20px 16px;text-align:center}\n' +
-'.footer-nav{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:14px}\n' +
-'.footer-nav a{color:var(--text-secondary);text-decoration:none;font-size:13px}\n' +
-'.footer-nav a:hover{color:var(--accent)}\n' +
-'.footer-logo img{height:36px;margin-bottom:10px}\n' +
-'.footer-copy{color:var(--text-muted);font-size:12px}\n' +
-'.sticky-ad{position:fixed;bottom:0;left:0;width:100%;text-align:center;z-index:999999}\n' +
-'.sticky-ad-inner{position:relative;display:inline-block;max-width:100%}\n' +
-'.sticky-close{position:absolute;top:5px;right:5px;background:#49de80;color:#000;width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;z-index:2;font-weight:bold;border:none}\n' +
-'.scoreboard-wrap{position:relative;width:100%;height:150px;margin-top:12px}\n' +
-'.scoreboard-wrap iframe{width:100%;height:100%;border:none}\n' +
-'.scoreboard-cover{position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999}\n' +
-'</style>\n' +
-'</head>\n' +
-'<body>\n' +
-bodyapi + '\n' +
-pageskinHTML + '\n' +
-'<div class="top-bar">\n' +
-'<span>Güncel: <a href="https://' + hostname + '">' + hostname + '</a> &nbsp;|&nbsp; Sonraki: <a href="https://' + nextDomain + '">' + nextDomain + '</a></span>\n' +
-'<div class="social-icons">' + twHTML + igHTML + tgHTML + fbHTML + ytHTML + '</div>\n' +
-'</div>\n' +
-'<header>\n' +
-'<a href="/" class="header-logo"><img src="' + logo + '" alt="logo" width="' + logowidth + '" height="' + logoheight + '" loading="lazy"/></a>\n' +
-'<nav>' + menuHTML + '</nav>\n' +
-'</header>\n' +
+  return '<!DOCTYPE html>' +
+'<html lang="tr">' +
+'<head>' +
+'<meta charset="UTF-8"/>' +
+'<title>' + title + '</title>' +
+'<meta name="description" content="' + description + '"/>' +
+'<meta property="og:title" content="' + title + '"/>' +
+'<meta property="og:description" content="' + description + '"/>' +
+'<meta property="og:locale" content="tr_TR"/>' +
+'<meta property="og:type" content="website"/>' +
+'<meta name="viewport" content="width=device-width, initial-scale=1.0"/>' +
+'<meta http-equiv="X-UA-Compatible" content="ie=edge"/>' +
+'<link rel="shortcut icon" href="' + favicon + '" type="image/x-icon"/>' +
+'<link rel="icon" href="' + favicon + '" type="image/x-icon"/>' +
+'<link rel="amphtml" href="' + amp + '"/>' +
+'<link rel="dns-prefetch" href="//fonts.googleapis.com"/>' +
+'<link rel="dns-prefetch" href="//cdnjs.cloudflare.com"/>' +
+'<link rel="stylesheet" href="https://site-assets.fontawesome.com/releases/v6.0.0/css/all.css"/>' +
+'<link rel="stylesheet" href="' + BASE + '/assets/v1/css/videoplayer.css"/>' +
+'<link rel="stylesheet" href="' + BASE + '/assets/v1/css/playerstyle.css?v=5009"/>' +
+'<link rel="stylesheet" href="' + BASE + '/assets/v1/css/glide.core.css"/>' +
+'<link rel="stylesheet" href="' + BASE + '/assets/v1/css/glide.theme.css"/>' +
+'<link rel="stylesheet" href="' + BASE + '/assets/v1/css/lig.css"/>' +
+'<link rel="stylesheet" href="' + BASE + '/assets/v1/css/Style.css?v=36731"/>' +
+'<link rel="stylesheet" href="' + BASE + '/assets/v1/css/Responsive.css?v=7377"/>' +
+'<link href="//fonts.googleapis.com/css?family=Rubik:300,400,700&display=swap" rel="stylesheet"/>' +
+headerapi +
+analyticsapi +
+'<style>' +
+'header ul li a span{color:#f00000;font-weight:bolder;}' +
+'header ul li a{color:rgba(255,255,255,0.8)}' +
+'.live-player,.plyr--video,.sportur .teams{--color:#f00000!important}' +
+'body,input,textarea,option,select,.sr-bb,.plyr--video,.sr-widget{font-family:\'Rubik\',sans-serif!important}' +
+'body{background:#05070b;--mobilbg:#05070b;--ampbg:#05070b;}' +
+'body::before{background-image:radial-gradient(circle at center,#32333f 0,transparent 66.66%);}' +
+'.footer-links{grid-template-columns:repeat(3,1fr);}' +
+'@media screen and (min-width:800px){.sayfa-arka{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-2;background:url(' + reklam3 + ') ' + pageskincolor + ' no-repeat center top fixed;background-size:cover}}' +
+'#section-channels{padding:10px;}' +
+'#channels{max-height:572px;overflow:auto;}' +
+'#channels a{display:block;border:1px solid rgba(255,255,255,.1);border-radius:2px;-webkit-border-radius:2px;-moz-border-radius:2px;margin-bottom:10px;height:70px;text-align:center;line-height:70px;}' +
+'#channels a img{max-width:80%;max-height:50px;}' +
+'</style>' +
+'</head>' +
+'<body data-device="d" data-d="d" oncontextmenu="return !0">' +
+bodyapi +
+pageskinHTML +
+'<div class="header-top">' +
+'<div class="header-text">Güncel Adresimiz: <a href="https://' + hostname + '" target="_blank">https://' + hostname + '</a> &nbsp;|&nbsp; Sonraki: <a href="https://' + nextDomain + '" target="_blank">https://' + nextDomain + '</a></div>' +
+'<div class="social-area">' + fbHTML + igHTML + twHTML + tgHTML + ytHTML + '</div>' +
+'</div>' +
+
+'<header>' +
+'<a href="/"><div class="logo"><img src="' + logo + '" loading="lazy" alt="' + title + '" width="' + logowidth + '" height="' + logoheight + '"/></div></a>' +
+'<ul>' + menuHTML + '</ul>' +
+'</header>' +
+
 rek1HTML + rek4HTML +
-'<div class="channels-wrap">\n' +
-'<button class="slider-btn slider-prev" onclick="sliderKaydir(-1)">&#8249;</button>\n' +
-'<div class="channels-inner" id="kanalSlider">' + kanalHTML + '</div>\n' +
-'<button class="slider-btn slider-next" onclick="sliderKaydir(1)">&#8250;</button>\n' +
-'</div>\n' +
-'<div class="main-layout">\n' +
-'<div class="player-col">\n' +
-'<div class="player-wrapper"><iframe id="macth-video" name="macth-video" src="matches?id=bein-sports-1" allowfullscreen scrolling="no"></iframe></div>\n' +
+
+'<div class="channel-area">' +
+'<div class="channel-left" onclick="glideSlider && glideSlider.go(\'<\')">' +
+'<svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><g><path class="icon-pasif" fill="currentColor" d="M285.59 410.4a23.93 23.93 0 0 1 0 33.84l-22.7 22.65a24 24 0 0 1-33.94 0l-154.31-154L131.42 256z"></path><path class="icon-aktif" fill="currentColor" d="M262.85 45.06l22.7 22.65a23.93 23.93 0 0 1 0 33.84L74.58 312.9l-40-40a23.94 23.94 0 0 1 0-33.84l194.33-194a24 24 0 0 1 33.94 0z"></path></g></svg>' +
+'</div>' +
+'<div class="channel-list glide" id="glideSlide">' +
+'<div class="glide__track" data-glide-el="track">' +
+'<div class="glide__slides">' + kanalHTML + '</div>' +
+'</div>' +
+'</div>' +
+'<div class="channel-right" onclick="glideSlider && glideSlider.go(\'>\' )">' +
+'<svg aria-hidden="true" focusable="false" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512"><g><path class="icon-pasif" fill="currentColor" d="M188.74 256l56.78 56.89L91.21 466.9a24 24 0 0 1-33.94 0l-22.7-22.65a23.93 23.93 0 0 1 0-33.84z"></path><path class="icon-aktif" fill="currentColor" d="M91.25 45.06l194.33 194a23.93 23.93 0 0 1 0 33.84l-40 40-211-211.34a23.92 23.92 0 0 1 0-33.84l22.7-22.65a24 24 0 0 1 33.97-.01z"></path></g></svg>' +
+'</div>' +
+'</div>' +
+
+'<div class="container-grid player-grid">' +
+'<div class="live-player" data-loadbalancer="1" data-loadbalancerdomain="osflare.work">' +
+'<div class="player-attributes">' +
+'<iframe id="macth-video" name="macth-video" width="100%" height="450" scrolling="no" frameborder="0" src="matches?id=bein-sports-1" allowfullscreen=""></iframe>' +
+'</div>' +
+'</div>' +
+
+'<div class="player-channel-area">' +
+'<div class="live-list radarOn">' +
+'<div class="head-grid">' +
+'<div class="active" id="tab-canli" data-focustab="live"><div class="list-blink"></div><span>Canlı</span></div>' +
+'<div class="vertical-line"></div>' +
+'<div id="tab-yakinda" data-focustab="next"><div class="list-blink"></div><span>YAKINDA</span></div>' +
+'</div>' +
+
+'<div class="active" id="content-canli" data-tabbed="live">' +
+'<form class="match-search" action=""><label aria-label="Arama Yap"><input type="search" id="livesearch" name="livesearch" placeholder="Canlı Maçlar: Takım veya Lig arayın..."/></label></form>' +
+'<div class="live-list-grid">' +
+'<div class="list-tabbed">' +
+'<div class="active" data-matchfilter="" title="Tüm maçları göster">Tümü</div>' +
+'<div data-matchfilter="Futbol" title="Futbol"><svg class="icon" width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M16 0c-8.836 0-16 7.164-16 16s7.164 16 16 16 16-7.164 16-16c-0.010-8.832-7.168-15.99-16-16z"/></svg></div>' +
+'<div data-matchfilter="Basketbol" title="Basketbol"><svg class="icon" width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M10.098 11.425l-6.065-6.065c-2.473 2.774-3.886 6.272-4.033 9.995 3.762-0.060 7.298-1.439 10.098-3.93z"/></svg></div>' +
+'<div data-matchfilter="Voleybol" title="Voleybol"><svg class="icon" width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><path d="M10.712 8.951c4.982-4.304 11.99-5.349 17.986-2.726-2.931-3.785-7.518-6.223-12.676-6.223z"/></svg></div>' +
+'<div data-matchfilter="Masa Tenisi" title="Masa Tenisi"><svg class="icon" width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><circle cx="28.814" cy="28.294" r="3.706"/></svg></div>' +
+'<div data-matchfilter="e-Sporlar" title="e-Sporlar"><svg class="icon" width="18" height="18" viewBox="0 0 32 32" fill="currentColor"><rect x="2" y="8" width="28" height="18" rx="4"/></svg></div>' +
+'</div>' +
+'<div class="list-area">' +
+'<div class="real-matches"></div>' +
+'<div class="bet-matches" id="matches-content"></div>' +
+'</div>' +
+'</div>' +
+'</div>' +
+
+'<div id="content-yakinda" data-tabbed="next" style="display:none;">' +
+'<form class="match-search" action=""><label aria-label="Search"><input type="search" id="nextsearch" name="nextsearch" placeholder="Gelecek Maçlar: Takım veya Lig arayın..."/></label></form>' +
+'<div class="live-list-grid">' +
+'<div class="list-tabbed"><div class="active" data-matchfilter="" title="Tüm maçları göster">Tümü</div></div>' +
+'<div class="live-list"><div class="list-area"><div class="real-matches" id="channels-content"></div></div></div>' +
+'</div>' +
+'</div>' +
+
+'</div>' +
+'</div>' +
+'</div>' +
+
 rek2HTML + rek5HTML +
-'</div>\n' +
-'<div class="sidebar"><div class="sidebar-box">\n' +
-'<div class="tab-bar">\n' +
-'<div class="tab-btn active" id="tab-mac" onclick="switchTab(\'mac\')"><div class="blink-dot"></div> Maçlar</div>\n' +
-'<div class="tab-btn" id="tab-kanal" onclick="switchTab(\'kanal\')">Kanallar</div>\n' +
-'</div>\n' +
-'<div class="search-wrap"><input type="text" id="searchInput" placeholder="Maç veya kanal ara..."/><i class="fas fa-search s-icon"></i></div>\n' +
-'<div class="sport-filter" id="sportFilter">\n' +
-'<button class="sport-btn active" data-filter="Futbol,Futbol TR,Football,FutboI,Basketbol,Basketbol TR,BasketboI">Tümü</button>\n' +
-'<button class="sport-btn" data-filter="Futbol,Futbol TR,Football,FutboI">Futbol</button>\n' +
-'<button class="sport-btn" data-filter="Basketbol,Basketbol TR,BasketboI">Basketbol</button>\n' +
-'<button class="sport-btn" data-filter="Tenis">Tenis</button>\n' +
-'<button class="sport-btn" data-filter="Voleybol">Voleybol</button>\n' +
-'<button class="sport-btn" data-filter="Masa Tenisi">M.Tenis</button>\n' +
-'<button class="sport-btn" data-filter="e-Sporlar">e-Spor</button>\n' +
-'</div>\n' +
-'<div id="tab-content-mac" class="matches-scroll"><div id="matches-content"></div></div>\n' +
-'<div id="tab-content-kanal" style="display:none"><div id="channels-content"></div></div>\n' +
-'</div></div>\n' +
-'</div>\n' +
-'<footer>\n' +
-'<div class="footer-nav">' + footerMenuHTML + '</div>\n' +
+
+'<footer>' +
+'<div class="footer-links">' + footerMenuHTML + '</div>' +
 scoreboardHTML +
-'<div class="footer-logo"><img src="' + logo + '" alt="logo"/></div>\n' +
-'<div class="footer-copy">' + footermetin + '</div>\n' +
-footerapi + '\n' +
-apilinkcikisi + '\n' +
-'</footer>\n' +
+'<div class="copyright-text"><p>' + footermetin + '</p></div>' +
+footerapi +
+apilinkcikisi +
+'</footer>' +
+
 rek6HTML +
-'<script>\n' +
-'function sliderKaydir(yon){\n' +
-'  var s=document.getElementById("kanalSlider");\n' +
-'  s.scrollBy({left:yon*280,behavior:"smooth"});\n' +
-'}\n' +
-'function switchTab(tab){\n' +
-'  var isMac=tab==="mac";\n' +
-'  document.getElementById("tab-content-mac").style.display=isMac?"block":"none";\n' +
-'  document.getElementById("tab-content-kanal").style.display=isMac?"none":"block";\n' +
-'  document.getElementById("tab-mac").classList.toggle("active",isMac);\n' +
-'  document.getElementById("tab-kanal").classList.toggle("active",!isMac);\n' +
-'  document.getElementById("sportFilter").style.display=isMac?"flex":"none";\n' +
-'}\n' +
-'function kanalSec(id){\n' +
-'  document.querySelectorAll(".channel-btn").forEach(function(b){b.classList.remove("active")});\n' +
-'  var el=document.querySelector("[data-kanal=\'"+id+"\']");\n' +
-'  if(el)el.classList.add("active");\n' +
-'  var iframe=document.getElementById("macth-video");\n' +
-'  if(iframe)iframe.src="matches?id="+id;\n' +
-'}\n' +
-'document.querySelectorAll(".sport-btn").forEach(function(btn){\n' +
-'  btn.addEventListener("click",function(){\n' +
-'    document.querySelectorAll(".sport-btn").forEach(function(b){b.classList.remove("active")});\n' +
-'    this.classList.add("active");\n' +
-'    filterMatches(this.dataset.filter);\n' +
-'  });\n' +
-'});\n' +
-'function filterMatches(categoryStr){\n' +
-'  var filters=categoryStr.split(",").map(function(f){return f.trim().toLowerCase()});\n' +
-'  document.querySelectorAll("#matches-content .single-match").forEach(function(match){\n' +
-'    var type=(match.getAttribute("data-matchtype")||"").toLowerCase();\n' +
-'    match.style.display=filters.includes(type)?"":"none";\n' +
-'  });\n' +
-'}\n' +
-'document.getElementById("searchInput").addEventListener("keyup",function(){\n' +
-'  var q=this.value.toLowerCase();\n' +
-'  document.querySelectorAll(".single-match").forEach(function(el){\n' +
-'    el.style.display=el.textContent.toLowerCase().includes(q)?"":"none";\n' +
-'  });\n' +
-'});\n' +
-'fetch("' + mUrl + '").then(function(r){return r.text()}).then(function(data){\n' +
-'  document.getElementById("matches-content").innerHTML=data;\n' +
-'  filterMatches("Futbol,Futbol TR,Football,FutboI,Basketbol,Basketbol TR,BasketboI");\n' +
-'}).catch(function(e){console.error(e)});\n' +
-'fetch("' + cUrl + '").then(function(r){return r.text()}).then(function(data){\n' +
-'  document.getElementById("channels-content").innerHTML=data;\n' +
-'}).catch(function(e){console.error(e)});\n' +
-'<\/script>\n' +
-'</body>\n' +
-'</html>';
+
+'<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"><\/script>' +
+'<script src="//cdnjs.cloudflare.com/ajax/libs/hls.js/1.1.5/hls.min.js"><\/script>' +
+'<script src="//cdnjs.cloudflare.com/ajax/libs/plyr/3.7.8/plyr.min.js"><\/script>' +
+'<script src="' + BASE + '/assets/v1/js/global.js?v=2881"><\/script>' +
+'<script src="' + BASE + '/assets/v1/js/playeroptions.js?v=434337203"><\/script>' +
+'<script src="' + BASE + '/assets/v1/js/glide.js"><\/script>' +
+'<script src="' + BASE + '/assets/v1/js/main.js?v=18540"><\/script>' +
+
+'<script>' +
+'var glideSlider;' +
+'document.addEventListener("DOMContentLoaded", function(){' +
+'  if(typeof Glide !== "undefined"){' +
+'    glideSlider = new Glide("#glideSlide",{type:"slider",perView:7,gap:8,breakpoints:{1200:{perView:6},900:{perView:5},600:{perView:3},400:{perView:2}}});' +
+'    glideSlider.mount();' +
+'  }' +
+'});' +
+
+'function kanalSec(id){' +
+'  document.querySelectorAll(".single-channel").forEach(function(el){el.classList.remove("active");});' +
+'  var el=document.querySelector("[data-stream=\'"+id+"\']");' +
+'  if(el) el.classList.add("active");' +
+'  var iframe=document.getElementById("macth-video");' +
+'  if(iframe) iframe.src="matches?id="+id;' +
+'}' +
+
+'document.getElementById("tab-canli").addEventListener("click",function(){' +
+'  document.getElementById("content-canli").style.display="block";' +
+'  document.getElementById("content-yakinda").style.display="none";' +
+'  this.classList.add("active");' +
+'  document.getElementById("tab-yakinda").classList.remove("active");' +
+'});' +
+'document.getElementById("tab-yakinda").addEventListener("click",function(){' +
+'  document.getElementById("content-yakinda").style.display="block";' +
+'  document.getElementById("content-canli").style.display="none";' +
+'  this.classList.add("active");' +
+'  document.getElementById("tab-canli").classList.remove("active");' +
+'});' +
+
+'document.querySelectorAll(".list-tabbed div").forEach(function(btn){' +
+'  btn.addEventListener("click",function(){' +
+'    document.querySelectorAll(".list-tabbed div").forEach(function(b){b.classList.remove("active");});' +
+'    this.classList.add("active");' +
+'    var f=this.getAttribute("data-matchfilter");' +
+'    document.querySelectorAll(".single-match").forEach(function(m){' +
+'      m.style.display=(f===""||m.getAttribute("data-matchtype")===f)?"flex":"none";' +
+'    });' +
+'  });' +
+'});' +
+
+'document.getElementById("livesearch").addEventListener("keyup",function(){' +
+'  var q=this.value.toLowerCase();' +
+'  document.querySelectorAll("#matches-content .single-match").forEach(function(m){' +
+'    m.style.display=m.textContent.toLowerCase().includes(q)?"flex":"none";' +
+'  });' +
+'});' +
+
+'fetch("' + mUrl + '").then(function(r){return r.text();}).then(function(data){' +
+'  document.getElementById("matches-content").innerHTML=data;' +
+'}).catch(function(e){console.error(e);});' +
+
+'fetch("' + cUrl + '").then(function(r){return r.text();}).then(function(data){' +
+'  document.getElementById("channels-content").innerHTML=data;' +
+'}).catch(function(e){console.error(e);});' +
+'<\/script>' +
+
+'</body></html>';
 }
