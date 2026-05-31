@@ -15,13 +15,13 @@ export function getTema3Html(params) {
   const BASE = 'https://piabettv20.live';
 
   const kanallar = [
-    { ad: "S Sport 1",       img: BASE + "/assets/v5/images/s-sport.webp",        id: "s-sport-1" },
-    { ad: "S Sport 2",       img: BASE + "/assets/v5/images/s-sport-2.webp",       id: "s-sport-2" },
-    { ad: "A SPOR",          img: BASE + "/assets/v5/images/a-spor.webp",          id: "a-spor" },
-    { ad: "SPORSMART",       img: BASE + "/assets/v5/images/spor-smart.webp",      id: "spor-smart" },
-    { ad: "Tivibu Spor 1",   img: BASE + "/assets/v5/images/tivibu-spor-1.webp",   id: "tivibu-spor-1" },
-    { ad: "Tivibu Spor 2",   img: BASE + "/assets/v5/images/tivibu-spor-2.webp",   id: "tivibu-spor-2" },
-    { ad: "Tivibu Spor 3",   img: BASE + "/assets/v5/images/tivibu-spor-3.webp",   id: "tivibu-spor-3" },
+    { ad: "S Sport 1",       img: BASE + "/assets/v1/images/s-sports-1.png",        id: "s-sport-1" },
+    { ad: "S Sport 2",       img: BASE + "/assets/v1/images/s-sports-2.webp",       id: "s-sport-2" },
+    { ad: "A SPOR",          img: BASE + "/assets/v1/images/a-spor.png",          id: "a-spor" },
+    { ad: "SPORSMART",       img: BASE + "/assets/v1/images/spor-smart.png",      id: "spor-smart" },
+    { ad: "Tivibu Spor 1",   img: BASE + "/assets/v1/images/tivibu-spor-1.png",   id: "tivibu-spor-1" },
+    { ad: "Tivibu Spor 2",   img: BASE + "/assets/v1/images/tivibu-spor-2.png",   id: "tivibu-spor-2" },
+    { ad: "Tivibu Spor 3",   img: BASE + "/assets/v1/images/tivibu-spor-3.png",   id: "tivibu-spor-3" },
     { ad: "Bein Sports 1",   img: BASE + "/assets/v5/images/bein-sports-1.webp",   id: "bein-sports-1" },
     { ad: "Bein Sports 2",   img: BASE + "/assets/v5/images/bein-sports-2.webp",   id: "bein-sports-2" },
     { ad: "Bein Sports 3",   img: BASE + "/assets/v5/images/bein-sports-3.webp",   id: "bein-sports-3" },
