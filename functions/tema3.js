@@ -12,7 +12,7 @@ export function getTema3Html(params) {
     matchesUrl, channelsUrl
   } = params;
 
-  const BASE = 'https://piabettv21.live';
+  const BASE = 'https://piabettv20.live';
 
   const kanallar = [
     { ad: "S Sport 1",       img: BASE + "/assets/v5/images/s-sport.webp",        id: "s-sport-1" },
