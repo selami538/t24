@@ -6,7 +6,7 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const hostname = url.hostname;
 
-  // www yönlendirme
+  // www yönlendirmesi
   if (hostname.startsWith("www.")) {
     const newHost = hostname.replace(/^www\./, "");
     const redirectUrl = `${url.protocol}//${newHost}${url.pathname}${url.search}`;
