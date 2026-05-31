@@ -193,17 +193,17 @@ function getTema2Html(params) {
 .menu-item.active { opacity: 1; filter: brightness(1.5); }
 @media screen and (max-width: 600px) { .nomobile { display: none; } }
 /* KANAL SLIDER */
-.t2-channel-area { position: relative; display: flex; align-items: center; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.08); padding: 0 36px; }
-.t2-channel-inner { display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; padding: 8px 0; flex: 1; }
+.t2-channel-area { position: relative; display: flex; align-items: center; background: #0d0f14; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 44px; }
+.t2-channel-inner { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 12px 0; flex: 1; }
 .t2-channel-inner::-webkit-scrollbar { display: none; }
-.t2-kanal-kart { flex-shrink: 0; background: #111520; border: 2px solid rgba(255,255,255,0.08); border-radius: 6px; padding: 8px 14px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; min-width: 110px; height: 56px; }
-.t2-kanal-kart:hover { border-color: rgba(255,255,255,0.3); background: #1a1f2e; }
-.t2-kanal-kart.active { border-color: var(--color, #49de80); }
-.t2-kanal-kart img { max-height: 32px; max-width: 90px; width: auto; object-fit: contain; }
-.t2-slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; z-index: 5; transition: all 0.2s; user-select: none; }
-.t2-slider-btn:hover { background: rgba(255,255,255,0.2); }
-.t2-slider-prev { left: 4px; }
-.t2-slider-next { right: 4px; }
+.t2-kanal-kart { flex-shrink: 0; background: #1a1d26; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; min-width: 160px; height: 72px; }
+.t2-kanal-kart:hover { border-color: rgba(255,255,255,0.3); background: #22263a; }
+.t2-kanal-kart.active { border-color: #49de80; background: #22263a; }
+.t2-kanal-kart img { max-height: 42px; max-width: 120px; width: auto; object-fit: contain; }
+.t2-slider-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(10,12,18,0.9); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 5; transition: all 0.2s; user-select: none; line-height: 1; }
+.t2-slider-btn:hover { background: rgba(255,255,255,0.15); }
+.t2-slider-prev { left: 6px; }
+.t2-slider-next { right: 6px; }
 </style>
 ${headerapi}
 ${analyticsapi}
