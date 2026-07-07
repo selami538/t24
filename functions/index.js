@@ -31,14 +31,26 @@ export async function onRequest(context) {
   if (aktifTema === 0 || aktifTema === 1) {
     const phpUrl = "https://api.altinoksoft.com" + url.pathname + url.search;
 
+    // Gelen başlıkları kopyala ama host'u api adresine göre düzelt
+    const headers = new Headers(request.headers);
+    headers.set("Host", "api.altinoksoft.com");
+    headers.delete("accept-encoding");
+
     const phpRequest = new Request(phpUrl, {
       method: request.method,
-      headers: request.headers,
+      headers: headers,
       body: ["GET", "HEAD"].includes(request.method) ? null : request.body,
       redirect: "follow"
     });
 
-    return fetch(phpRequest);
+    const phpResponse = await fetch(phpRequest);
+
+    // Cevabı yeniden paketle (bazı başlıklar sorun çıkarabiliyor)
+    return new Response(phpResponse.body, {
+      status: phpResponse.status,
+      statusText: phpResponse.statusText,
+      headers: phpResponse.headers
+    });
   }
 
   // ===== TEMA 2 veya 3 -> Pages'in kendi HTML'i =====
