@@ -6,6 +6,7 @@ export async function onRequest(context) {
   const url = new URL(request.url);
   const hostname = url.hostname;
 
+  // www. varsa www'suz adrese yönlendir
   if (hostname.startsWith("www.")) {
     const newHost = hostname.replace(/^www\./, "");
     const redirectUrl = `${url.protocol}//${newHost}${url.pathname}${url.search}`;
@@ -26,21 +27,21 @@ export async function onRequest(context) {
 
   const aktifTema = parseInt(json?.tema?.tema_sec ?? 0);
 
+  // ===== TEMA 0 veya 1 -> PHP hosting'e proxy =====
   if (aktifTema === 0 || aktifTema === 1) {
-    const phpRequest = new Request(
-      "https://api.altinoksoft.com" + url.pathname + url.search,
-      {
-        method: request.method,
-        headers: {
-          ...Object.fromEntries(request.headers),
-          "Host": "altinoksoft.com"
-        },
-        body: ["GET", "HEAD"].includes(request.method) ? null : request.body
-      }
-    );
+    const phpUrl = "https://api.altinoksoft.com" + url.pathname + url.search;
+
+    const phpRequest = new Request(phpUrl, {
+      method: request.method,
+      headers: request.headers,
+      body: ["GET", "HEAD"].includes(request.method) ? null : request.body,
+      redirect: "manual"
+    });
+
     return fetch(phpRequest);
   }
 
+  // ===== TEMA 2 veya 3 -> Pages'in kendi HTML'i =====
   const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
     return String(parseInt(match) + 1);
   });
