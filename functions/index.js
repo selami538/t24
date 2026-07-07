@@ -35,7 +35,7 @@ export async function onRequest(context) {
       method: request.method,
       headers: request.headers,
       body: ["GET", "HEAD"].includes(request.method) ? null : request.body,
-      redirect: "manual"
+      redirect: "follow"
     });
 
     return fetch(phpRequest);
@@ -158,6 +158,7 @@ function getTema2Html(params) {
   return `<!DOCTYPE html>
 <html lang="tr">
 <head>
+<base href="/">
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <meta charset="utf-8">
 <meta content='width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1' name='viewport'/>
