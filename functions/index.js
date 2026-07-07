@@ -30,23 +30,29 @@ export async function onRequest(context) {
   // ===== TEMA 0 veya 1 -> PHP hosting'e proxy =====
   if (aktifTema === 0 || aktifTema === 1) {
 
-    // Güzel URL'i PHP'nin anladığı parametreli hale çevir
-    let phpPath = url.pathname + url.search;
+    let targetPath = url.pathname;
+    let targetSearch = url.search;
 
-    // /izle/xxx  ->  /izle.php?yayin_seo=xxx
-    const izleMatch = url.pathname.match(/^\/izle\/(.+)$/);
-    if (izleMatch) {
-      phpPath = "/izle.php?yayin_seo=" + izleMatch[1];
+    /*
+      Tema 1 izle link düzeltmesi:
+      /izle/bein-sports-1
+      ->
+      /izle.php?yayin_seo=bein-sports-1
+    */
+    const izleMatch = url.pathname.match(/^\/izle\/([^\/?#]+)\/?$/);
+
+    if (aktifTema === 1 && izleMatch) {
+      const yayinSeo = decodeURIComponent(izleMatch[1]);
+      targetPath = "/izle.php";
+
+      const params = new URLSearchParams(url.search);
+      params.set("yayin_seo", yayinSeo);
+      targetSearch = "?" + params.toString();
     }
 
-    // /mac-izle/xxx  ->  /izle.php?yayin_seo=xxx  (bu tema mac-izle de kullanıyor olabilir)
-    const macIzleMatch = url.pathname.match(/^\/mac-izle\/(.+)$/);
-    if (macIzleMatch) {
-      phpPath = "/izle.php?yayin_seo=" + macIzleMatch[1];
-    }
+    const phpUrl = "https://api.altinoksoft.com" + targetPath + targetSearch;
 
-    const phpUrl = "https://api.altinoksoft.com" + phpPath;
-
+    // Gelen başlıkları kopyala ama host'u api adresine göre düzelt
     const headers = new Headers(request.headers);
     headers.set("Host", "api.altinoksoft.com");
     headers.delete("accept-encoding");
@@ -60,10 +66,14 @@ export async function onRequest(context) {
 
     const phpResponse = await fetch(phpRequest);
 
+    // Cevabı yeniden paketle (bazı başlıklar sorun çıkarabiliyor)
+    const responseHeaders = new Headers(phpResponse.headers);
+    responseHeaders.delete("content-encoding");
+
     return new Response(phpResponse.body, {
       status: phpResponse.status,
       statusText: phpResponse.statusText,
-      headers: phpResponse.headers
+      headers: responseHeaders
     });
   }
 
