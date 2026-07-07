@@ -29,9 +29,24 @@ export async function onRequest(context) {
 
   // ===== TEMA 0 veya 1 -> PHP hosting'e proxy =====
   if (aktifTema === 0 || aktifTema === 1) {
-    const phpUrl = "https://api.altinoksoft.com" + url.pathname + url.search;
 
-    // Gelen başlıkları kopyala ama host'u api adresine göre düzelt
+    // Güzel URL'i PHP'nin anladığı parametreli hale çevir
+    let phpPath = url.pathname + url.search;
+
+    // /izle/xxx  ->  /izle.php?yayin_seo=xxx
+    const izleMatch = url.pathname.match(/^\/izle\/(.+)$/);
+    if (izleMatch) {
+      phpPath = "/izle.php?yayin_seo=" + izleMatch[1];
+    }
+
+    // /mac-izle/xxx  ->  /izle.php?yayin_seo=xxx  (bu tema mac-izle de kullanıyor olabilir)
+    const macIzleMatch = url.pathname.match(/^\/mac-izle\/(.+)$/);
+    if (macIzleMatch) {
+      phpPath = "/izle.php?yayin_seo=" + macIzleMatch[1];
+    }
+
+    const phpUrl = "https://api.altinoksoft.com" + phpPath;
+
     const headers = new Headers(request.headers);
     headers.set("Host", "api.altinoksoft.com");
     headers.delete("accept-encoding");
@@ -45,7 +60,6 @@ export async function onRequest(context) {
 
     const phpResponse = await fetch(phpRequest);
 
-    // Cevabı yeniden paketle (bazı başlıklar sorun çıkarabiliyor)
     return new Response(phpResponse.body, {
       status: phpResponse.status,
       statusText: phpResponse.statusText,
