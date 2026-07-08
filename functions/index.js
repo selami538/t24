@@ -59,7 +59,7 @@ export async function onRequest(context) {
     logoheight:   ayar.logo_height || "",
     favicon:      ayar.ayar_favicon || "",
     amp:          ayar.amp_guncel || "",
-    canlisonuc:   playerlogo.iletisim_mesaj || "",
+    canlisonuc:   ayar.ayar_skor || "",
     twitter:      ayar.ayar_twitter || "",
     telegram:     ayar.ayar_telegram || "",
     facebook:     ayar.ayar_facebook || "",
