@@ -1,44 +1,5 @@
 import { getTema3Html } from './tema3.js';
 
-const PHP_ORIGIN = "https://api.altinoksoft.com";
-
-async function phpProxy(request, targetUrl) {
-  const headers = new Headers(request.headers);
-
-  // Cloudflare tarafında bu başlıklar bazen boş/beyaz sayfa veya body bozulmasına sebep olabiliyor
-  headers.delete("host");
-  headers.delete("accept-encoding");
-  headers.set("x-forwarded-host", new URL(request.url).hostname);
-
-  const init = {
-    method: request.method,
-    headers,
-    redirect: "follow",
-    cf: { cacheTtl: 0, cacheEverything: false }
-  };
-
-  if (!["GET", "HEAD"].includes(request.method)) {
-    init.body = request.body;
-  }
-
-  const phpResponse = await fetch(targetUrl, init);
-  const responseHeaders = new Headers(phpResponse.headers);
-
-  // Proxy cevabında Cloudflare'ın tekrar encode etmesini bozabilecek başlıkları temizliyoruz
-  responseHeaders.delete("content-encoding");
-  responseHeaders.delete("content-length");
-  responseHeaders.delete("transfer-encoding");
-  responseHeaders.delete("connection");
-  responseHeaders.set("cache-control", "no-store, no-cache, must-revalidate, max-age=0");
-
-  return new Response(phpResponse.body, {
-    status: phpResponse.status,
-    statusText: phpResponse.statusText,
-    headers: responseHeaders
-  });
-}
-
-
 export async function onRequest(context) {
 
   const { request } = context;
@@ -50,25 +11,6 @@ export async function onRequest(context) {
     const newHost = hostname.replace(/^www\./, "");
     const redirectUrl = `${url.protocol}//${newHost}${url.pathname}${url.search}`;
     return Response.redirect(redirectUrl, 301);
-  }
-
-  /*
-    /izle/bein-sports-1 adresi PHP tarafında aslında:
-    /izle.php?yayin_seo=bein-sports-1
-    Bu yüzden bu route'u tema_sec sonucunu beklemeden direkt PHP'ye gönderiyoruz.
-  */
-  const izleMatch = url.pathname.match(/^\/izle\/([^\/?#]+)\/?$/i);
-  if (izleMatch) {
-    const yayinSeo = decodeURIComponent(izleMatch[1]);
-    const params = new URLSearchParams(url.search);
-    params.set("yayin_seo", yayinSeo);
-
-    return phpProxy(request, `${PHP_ORIGIN}/izle.php?${params.toString()}`);
-  }
-
-  // Biri direkt /izle.php?yayin_seo=... açarsa onu da PHP'ye gönder
-  if (url.pathname.toLowerCase() === "/izle.php") {
-    return phpProxy(request, `${PHP_ORIGIN}${url.pathname}${url.search}`);
   }
 
   const apiUrl = "https://api.altinoksoft.com/api/verirepo.php";
@@ -87,8 +29,16 @@ export async function onRequest(context) {
 
   // ===== TEMA 0 veya 1 -> PHP hosting'e proxy =====
   if (aktifTema === 0 || aktifTema === 1) {
-    const phpUrl = `${PHP_ORIGIN}${url.pathname}${url.search}`;
-    return phpProxy(request, phpUrl);
+    const phpUrl = "https://api.altinoksoft.com" + url.pathname + url.search;
+
+    const phpRequest = new Request(phpUrl, {
+      method: request.method,
+      headers: request.headers,
+      body: ["GET", "HEAD"].includes(request.method) ? null : request.body,
+      redirect: "manual"
+    });
+
+    return fetch(phpRequest);
   }
 
   // ===== TEMA 2 veya 3 -> Pages'in kendi HTML'i =====
@@ -208,7 +158,6 @@ function getTema2Html(params) {
   return `<!DOCTYPE html>
 <html lang="tr">
 <head>
-<base href="/">
 <meta http-equiv="content-type" content="text/html;charset=UTF-8" />
 <meta charset="utf-8">
 <meta content='width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1' name='viewport'/>
