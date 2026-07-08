@@ -155,8 +155,8 @@ export async function onRequest(context) {
             top: 0 !important; left: 0 !important;
             width: 100% !important; height: 100% !important;
             background-color: #000 !important;
-            background-position: center !important;
-            background-size: cover !important;
+            background-position: center center !important;
+            background-size: contain !important;
             background-repeat: no-repeat !important;
             z-index: 9998 !important;
             pointer-events: none !important;
@@ -286,7 +286,6 @@ export async function onRequest(context) {
       var player = new Clappr.Player({
         parentId: "#app",
         source: '',
-        poster: M.poster,
         width: '100%',
         height: '100%',
         autoPlay: false,
