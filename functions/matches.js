@@ -20,7 +20,7 @@ export async function onRequest(context) {
   let playerBtnColor   = "";     // buton rengi (opsiyonel)
 
   try {
-    const res2 = await fetch("https://panelnetspor.corepanel.pro/api/verirepo.php");
+    const res2 = await fetch("https://origin.altinoksoft.com/api/verirepo.php");
     const json = await res2.json();
 
     if (json.playerlogo) {
