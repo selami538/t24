@@ -20,7 +20,7 @@ export async function onRequest(context) {
   let playerBtnColor   = "";     // buton rengi (opsiyonel)
 
   try {
-    const res2 = await fetch("https://panelnetspor.corepanel.pro/api/verirepo.php");
+    const res2 = await fetch("https://origin.altinoksoft.com/api/verirepo.php");
     const json = await res2.json();
 
     if (json.playerlogo) {
@@ -155,7 +155,7 @@ export async function onRequest(context) {
             top: 0 !important; left: 0 !important;
             width: 100% !important; height: 100% !important;
             background-color: #000 !important;
-            background-position: center center !important;
+            background-position: center !important;
             background-size: cover !important;
             background-repeat: no-repeat !important;
             z-index: 9998 !important;
@@ -242,27 +242,6 @@ export async function onRequest(context) {
           }
           .v-ad-skip.ready { cursor: pointer !important; }
           .v-ad-skip.ready:hover { background: #e74c3c !important; border-color: #e74c3c !important; }
-
-          .v-unmute {
-            position: absolute !important;
-            bottom: 16px !important; left: 16px !important;
-            background: rgba(0,0,0,0.75) !important;
-            color: #fff !important;
-            font: 700 12px/1 'Roboto', sans-serif !important;
-            padding: 9px 14px !important;
-            border-radius: 6px !important;
-            border: 1px solid rgba(255,255,255,0.3) !important;
-            display: none !important;
-            align-items: center !important;
-            gap: 7px !important;
-            cursor: pointer !important;
-            z-index: 2147483647 !important;
-            pointer-events: auto !important;
-            text-transform: uppercase !important;
-          }
-          .v-unmute.v-show { display: flex !important; }
-          .v-unmute:hover { background: #e74c3c !important; border-color: #e74c3c !important; }
-          .v-unmute svg { width: 15px; height: 15px; fill: #fff; }
         </style>
       \`;
       $('head').append(customStyle);
@@ -307,10 +286,10 @@ export async function onRequest(context) {
       var player = new Clappr.Player({
         parentId: "#app",
         source: '',
+        poster: M.poster,
         width: '100%',
         height: '100%',
         autoPlay: false,
-        mute: true,
         playback: { playInline: true, recycleVideo: false, preload: 'none' },
         hlsPlayback: { playInline: true }
       });
@@ -322,33 +301,15 @@ export async function onRequest(context) {
         $('#app').css('position', 'relative').append(bgLayer);
       }
 
-      // Ses durumu (otomatik oynatma için sessiz başlar)
-      var wantSound = false;
-
-      function applySound() {
-        var av = document.getElementById('vAdVideo');
-        if (av) { try { av.muted = !wantSound; } catch (e) {} }
-        try { if (wantSound) { player.unmute(); } else { player.mute(); } } catch (e) {}
-        try {
-          var vp = player.core && player.core.activePlayback;
-          var mv = vp && vp.el;
-          if (mv && mv.tagName === 'VIDEO') mv.muted = !wantSound;
-        } catch (e) {}
-      }
-
-      // Unmute butonu
-      $('#app').css('position', 'relative').append(
-        '<div id="vUnmute" class="v-unmute">' +
-          '<svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>' +
-          'Sesi Aç' +
-        '</div>'
-      );
-
-      $(document).on('click', '#vUnmute', function() {
-        wantSound = true;
-        applySound();
-        $('#vUnmute').removeClass('v-show');
-      });
+      // Play overlay
+      var playOverlay = \`
+        <div class="v-play-overlay" id="vPlayOverlay">
+          <div class="v-play-btn">
+            <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      \`;
+      $('#app').css('position', 'relative').append(playOverlay);
 
       // ===================== STREAM ÇÖZÜMLEME (2. kod mantığı) =====================
       function resolveStream(rawUrl) {
@@ -412,11 +373,10 @@ export async function onRequest(context) {
         $('#vPosterBg').remove();
         if (!sourceLoaded) {
           sourceLoaded = true;
-          player.configure({ source: realSource, autoPlay: true, mute: !wantSound });
+          player.configure({ source: realSource, autoPlay: true });
         } else {
           player.play();
         }
-        if (!wantSound) $('#vUnmute').addClass('v-show');
       }
 
       function startRealStream() {
@@ -448,7 +408,6 @@ export async function onRequest(context) {
 
         adVideo.setAttribute('playsinline', '');
         adVideo.setAttribute('webkit-playsinline', '');
-        adVideo.muted = !wantSound;
 
         function endAd() {
           if (finished) return;
@@ -484,20 +443,17 @@ export async function onRequest(context) {
       }
 
       // ===================== PLAY BUTONU TIKLAMA =====================
-      // ===================== OTOMATİK BAŞLAT =====================
-      function autoBegin() {
+      $(document).on('click', '#vPlayOverlay', function() {
         $('#vPlayOverlay').remove();
         if (adActive && !adPlayed) {
           playAd();
         } else {
           startRealStream();
         }
-      }
+      });
 
       player.on(Clappr.Events.PLAYER_PLAY, function() {
         $('#vPosterBg').remove();
-        applySound();
-        if (!wantSound) $('#vUnmute').addClass('v-show');
         if (!logoShown) {
           $('.v-watermark').addClass('v-show');
           logoShown = true;
@@ -505,7 +461,6 @@ export async function onRequest(context) {
       });
 
       player.on(Clappr.Events.PLAYER_READY, function() {
-        if (!wantSound) { try { player.mute(); } catch (e) {} }
         var vp = player.core.activePlayback;
         var videoElement = vp && vp.el;
         if (videoElement && videoElement.tagName === 'VIDEO') {
@@ -576,9 +531,6 @@ export async function onRequest(context) {
 
       // ===================== STREAM'İ ARKA PLANDA ÇÖZMEYE BAŞLA =====================
       loadStream(STREAM_ID);
-
-      // Otomatik başlat (reklam varsa önce reklam, sessiz -> sonra yayın)
-      autoBegin();
     });
   })(jQuery);
   </script>
