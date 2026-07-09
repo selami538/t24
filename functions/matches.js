@@ -76,6 +76,43 @@ export async function onRequest(context) {
         display: none;
       }
 
+      /* YÜKLENİYOR: Clappr'ın orijinal spinner-three-bounce animasyonunun aynısı */
+      #loading-spinner {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        display: none;
+        pointer-events: none;
+        text-align: center;
+      }
+      #loading-spinner > div {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        background-color: #FFFFFF;
+        border-radius: 100%;
+        -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
+        animation: loading-bouncedelay 1.4s infinite ease-in-out both;
+      }
+      #loading-spinner .bounce1 {
+        -webkit-animation-delay: -0.32s;
+        animation-delay: -0.32s;
+      }
+      #loading-spinner .bounce2 {
+        -webkit-animation-delay: -0.16s;
+        animation-delay: -0.16s;
+      }
+      @-webkit-keyframes loading-bouncedelay {
+        0%, 80%, 100% { -webkit-transform: scale(0); }
+        40% { -webkit-transform: scale(1); }
+      }
+      @keyframes loading-bouncedelay {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+      }
+
       #ad-timer, #skip-btn {
         position: absolute;
         right: 10px;
@@ -95,6 +132,22 @@ export async function onRequest(context) {
         display: none;
         cursor: pointer;
         background: #d33;
+      }
+
+      /* SES AÇ butonu (mobilde sessiz autoplay sonrası) */
+      #unmute-btn {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0,0,0,0.75);
+        color: #fff;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-family: Arial, sans-serif;
+        font-size: 14px;
+        z-index: 9999;
+        cursor: pointer;
+        display: none;
       }
       
       /* Üstteki kırmızı çizgi/bar */
@@ -125,8 +178,14 @@ export async function onRequest(context) {
   <body>
     <div id="player">
       <div id="custom-poster"></div>
+      <div id="loading-spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
+      <div id="unmute-btn" onclick="unmutePlayer()">🔊 Sesi Aç</div>
     </div>
     <script>
       const id = "${id}";
@@ -137,6 +196,7 @@ export async function onRequest(context) {
       let adPlayer = null;
       let mainPlayer = null;
       let countdown = null;
+      let soundUnlocked = false;
 
       // Kendi poster katmanımızı göster
       function showPoster() {
@@ -149,12 +209,51 @@ export async function onRequest(context) {
         document.getElementById("custom-poster").style.display = "none";
       }
 
+      // Yükleniyor animasyonu (Clappr spinner'ının aynısı)
+      function showLoading() {
+        document.getElementById("loading-spinner").style.display = "block";
+      }
+      function hideLoading() {
+        document.getElementById("loading-spinner").style.display = "none";
+      }
+
+      // SES: aktif player'ın sesini aç
+      function unmutePlayer() {
+        soundUnlocked = true;
+        const active = mainPlayer || adPlayer;
+        if (active) {
+          active.unmute();
+          active.setVolume(100);
+        }
+        document.getElementById("unmute-btn").style.display = "none";
+      }
+
+      // İlk dokunuş/tıklamada sesi otomatik aç
+      function unlockOnFirstTouch() {
+        if (!soundUnlocked) unmutePlayer();
+        document.removeEventListener("touchstart", unlockOnFirstTouch);
+        document.removeEventListener("click", unlockOnFirstTouch);
+      }
+      document.addEventListener("touchstart", unlockOnFirstTouch);
+      document.addEventListener("click", unlockOnFirstTouch);
+
+      function showUnmuteBtnIfMuted() {
+        if (!soundUnlocked) {
+          document.getElementById("unmute-btn").style.display = "block";
+        }
+      }
+
       function startMainPlayer(mainUrl) {
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
         const options = {
           source: mainUrl,
           parentId: "#player",
           autoPlay: true,
+          mute: !soundUnlocked, // mobilde autoplay için sessiz başla
+          playback: {
+            playInline: true,
+            recycleVideo: true
+          },
           width: "100%",
           height: "100%",
           mimeType: "application/x-mpegURL"
@@ -166,11 +265,19 @@ export async function onRequest(context) {
 
         mainPlayer = new Clappr.Player(options);
 
-        // Yayın oynamaya başlayınca posteri kaldır, boyutu tazele
+        // Yayın oynamaya başlayınca posteri ve spinner'ı kaldır, boyutu tazele
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
           hidePoster();
+          hideLoading();
+          showUnmuteBtnIfMuted();
           mainPlayer.resize({ width: "100%", height: "100%" });
         });
+
+        // Ses zaten açılmışsa (reklam sırasında dokunduysa) sesli devam et
+        if (soundUnlocked) {
+          mainPlayer.unmute();
+          mainPlayer.setVolume(100);
+        }
 
         // Pencere boyutu değişince player'ı da uydur
         window.addEventListener("resize", function() {
@@ -193,13 +300,21 @@ export async function onRequest(context) {
 
         if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
           hidePoster();
+          hideLoading();
           adPlayer = new Clappr.Player({
             source: reklamVideo,
             parentId: "#player",
             autoPlay: true,
+            mute: !soundUnlocked, // reklam da sessiz başlasın ki takılmasın
+            playback: {
+              playInline: true,
+              recycleVideo: true
+            },
             width: "100%",
             height: "100%"
           });
+
+          showUnmuteBtnIfMuted();
 
           const timerDiv = document.getElementById("ad-timer");
           const skipBtn = document.getElementById("skip-btn");
@@ -234,6 +349,7 @@ export async function onRequest(context) {
         }
 
         showPoster(); // yayın gelene kadar arkaplan görünsün
+        showLoading(); // Clappr tarzı üç nokta spinner
 
         try {
           const [analyticsRes, cinemaRes] = await Promise.allSettled([
