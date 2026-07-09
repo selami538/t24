@@ -19,8 +19,8 @@ export async function onRequest(context) {
   let playerEkstraLink = "";
   let playerButonKonum = "sag"; // sag = sağ üst, sol = sol üst
 
-  // YENİ: Ekstra buton rengi (panelden ayar_btncolor)
-  let ekstraButonRenk = "#8B0000"; // varsayılan koyu kırmızı (görseldeki gibi)
+  // Ekstra buton rengi (panelden ayar_btncolor)
+  let ekstraButonRenk = "#e74c3c"; // panelden renk gelmezse varsayılan kırmızı
 
   try {
 
@@ -71,14 +71,14 @@ export async function onRequest(context) {
         playerButonKonum = "sol";
       }
 
-      // YENİ: ayar_btncolor playerlogo içinde de olabilir
+      // ayar_btncolor playerlogo içinde de olabilir
       if (json.playerlogo.ayar_btncolor) {
         ekstraButonRenk = json.playerlogo.ayar_btncolor;
       }
 
     }
 
-    // YENİ: ayar_btncolor "ayar" veya "ayarlar" tablosundan geliyorsa oradan da dene
+    // ayar_btncolor "ayar" veya "ayarlar" tablosundan geliyorsa oradan da dene
     if (json.ayar && json.ayar.ayar_btncolor) {
       ekstraButonRenk = json.ayar.ayar_btncolor;
     }
@@ -98,9 +98,7 @@ export async function onRequest(context) {
   if (playerTelegram) {
     butonlarHtml += `
         <a class="p-btn p-btn-tg" href="${playerTelegram}" target="_blank" rel="noopener">
-          <span class="p-ico p-ico-tg">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12" fill="#fff"><path d="M8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.227.05-.01.12-.022.166.022.047.044.042.124.037.146-.03.129-1.227 1.241-1.846 1.83-.193.186-.33.33-.32.526.004.043.013.107.03.155.02.054.04.1.05.111l.012.011c.18.118.31.2.31.2l.06.05c.193.16.318.282.452.395.13.11.281.214.41.214.18 0 .29-.165.36-.39.18-.65.4-1.71.42-1.81.03-.14.02-.27-.03-.36-.05-.09-.16-.13-.27-.13z"/></svg>
-          </span>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12" fill="#fff"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.227.05-.01.12-.022.166.022.047.044.042.124.037.146-.03.129-1.227 1.241-1.846 1.83-.193.186-.33.33-.32.526.004.043.013.107.03.155.02.054.04.1.05.111l.012.011c.18.118.31.2.31.2l.06.05c.193.16.318.282.452.395.13.11.281.214.41.214.18 0 .29-.165.36-.39.18-.65.4-1.71.42-1.81.03-.14.02-.27-.03-.36-.05-.09-.16-.13-.27-.13z"/></svg>
           TELEGRAM
         </a>`;
   }
@@ -108,7 +106,7 @@ export async function onRequest(context) {
   if (playerX) {
     butonlarHtml += `
         <a class="p-btn p-btn-x" href="${playerX}" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="13" height="13" fill="#fff"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-5.094l-3.97-4.804-4.034 4.804H.448l5.547-6.65L0 .75h5.117l3.595 4.39L12.6.75z"/></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="11" height="11" fill="#fff"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-5.094l-3.97-4.804-4.034 4.804H.448l5.547-6.65L0 .75h5.117l3.595 4.39L12.6.75z"/></svg>
           X
         </a>`;
   }
@@ -229,8 +227,7 @@ export async function onRequest(context) {
 
 
       /* ============================= */
-      /* PLAYER ÜSTÜ BUTONLAR          */
-      /* (görseldeki tasarıma uygun)   */
+      /* PLAYER ÜSTÜ BUTONLAR (eski stil) */
       /* ============================= */
       #player-buttons {
         position: absolute;
@@ -238,54 +235,38 @@ export async function onRequest(context) {
         ${playerButonKonum === "sol" ? "left: 10px;" : "right: 10px;"}
         z-index: 2147483647; /* Tam ekranda da en üstte kalsın */
         display: flex;
-        gap: 8px;
+        gap: 6px;
         align-items: center;
-        font-family: Arial, Helvetica, sans-serif;
+        font-family: Arial, sans-serif;
       }
 
       .p-btn {
         display: inline-flex;
         align-items: center;
-        gap: 7px;
+        gap: 5px;
         color: #fff;
         text-decoration: none;
-        font-size: 13px;
-        font-weight: 900;              /* Görseldeki gibi kalın */
-        font-style: italic;            /* Görseldeki gibi hafif eğik */
-        letter-spacing: 0.5px;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.4px;
         text-transform: uppercase;
-        padding: 7px 14px;
-        border-radius: 18px;           /* Görseldeki gibi hap (pill) şekli */
+        padding: 6px 10px;
+        border-radius: 6px;
         line-height: 1;
         white-space: nowrap;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.45);
+        opacity: 0.95;
         transition: opacity 0.15s ease, transform 0.15s ease;
       }
 
-      .p-btn:hover { opacity: 0.9; transform: scale(1.05); }
+      .p-btn:hover { opacity: 1; transform: scale(1.05); }
 
-      /* TELEGRAM: siyah buton + mavi yuvarlak ikon (görseldeki gibi) */
-      .p-btn-tg { background: #111; border: 1px solid rgba(255,255,255,0.15); }
-      .p-ico-tg {
-        width: 20px; height: 20px;
-        border-radius: 50%;
-        background: #229ED9;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-      }
-
-      /* X: siyah buton (görseldeki gibi) */
-      .p-btn-x { background: #111; border: 1px solid rgba(255,255,255,0.15); }
-
-      /* EKSTRA: rengi panelden (ayar_btncolor) geliyor */
+      .p-btn-tg     { background: #229ED9; }
+      .p-btn-x      { background: #000; border: 1px solid rgba(255,255,255,0.35); }
       .p-btn-ekstra { background: ${ekstraButonRenk}; }
 
       /* Küçük ekranlarda butonlar biraz ufalsın */
       @media (max-width: 480px) {
-        .p-btn { font-size: 10px; padding: 5px 9px; gap: 5px; }
-        .p-ico-tg { width: 15px; height: 15px; }
+        .p-btn { font-size: 9px; padding: 4px 7px; }
       }
 
       
@@ -379,18 +360,14 @@ export async function onRequest(context) {
       // TAM EKRAN DÜZELTMESİ:
       // Tam ekrana geçince butonları tam ekran olan
       // elemanın içine taşı, çıkınca geri getir.
-      // Yoksa tarayıcı sadece tam ekran elemanı gösterir
-      // ve butonlar kaybolur.
       // ============================================
       function tamEkranButonDuzelt() {
         const btns = document.getElementById("player-buttons");
         if (!btns) return;
         const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
         if (fsEl) {
-          // Tam ekrandayız: butonları tam ekran elemanının içine taşı
           fsEl.appendChild(btns);
         } else {
-          // Tam ekrandan çıktık: butonları eski yerine (#player) geri koy
           document.getElementById("player").appendChild(btns);
         }
       }
