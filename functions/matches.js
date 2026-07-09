@@ -96,19 +96,25 @@ export async function onRequest(context) {
         cursor: pointer;
         background: #d33;
       }
-      /* Üstteki kırmızı çizgi/bar */
-#player [data-player] .media-control-layer .bar,
+    /* Üstteki kırmızı çizgi/bar */
 #player [data-player] [data-border],
 #player [data-player] .player-border {
   display: none !important;
 }
 
-/* Alttaki kontrol barının üstündeki kırmızı seek çizgisi */
-#player [data-player] .bar-container,
-#player [data-player] .media-control .bar-background,
-#player [data-player] .media-control .bar-fill-1,
-#player [data-player] .media-control .bar-fill-2 {
+/* Sadece SEEK (ilerleme) çizgisini gizle — ses barına dokunma */
+#player [data-player] .media-control .bar-container[data-seekbar],
+#player [data-player] .media-control .bar-background[data-seekbar],
+#player [data-player] .media-control .bar-fill-1[data-seekbar],
+#player [data-player] .media-control .bar-fill-2[data-seekbar] {
   display: none !important;
+}
+
+/* Ses çizgisi görünür kalsın (garanti olsun diye geri açıyoruz) */
+#player [data-player] .media-control .bar-container[data-volume],
+#player [data-player] .drawer-container[data-volume],
+#player [data-player] .segmented-bar-element {
+  display: block !important;
 }
     </style>
     <script src="https://cdn.jsdelivr.net/gh/clappr/clappr@latest/dist/clappr.min.js"></script>
