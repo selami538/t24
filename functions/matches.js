@@ -20,7 +20,7 @@ export async function onRequest(context) {
   let playerButonKonum = "sag"; // sag = sağ üst, sol = sol üst
 
   // Ekstra buton rengi (panelden ayar_btncolor)
-  let ekstraButonRenk = "#e74c3c"; // panelden renk gelmezse varsayılan kırmızı
+  let ekstraButonRenk = "#6e1414"; // panelden renk gelmezse görseldeki koyu kırmızı
 
   try {
 
@@ -97,24 +97,28 @@ export async function onRequest(context) {
 
   if (playerTelegram) {
     butonlarHtml += `
-        <a class="p-btn p-btn-tg" href="${playerTelegram}" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12" fill="#fff"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.227.05-.01.12-.022.166.022.047.044.042.124.037.146-.03.129-1.227 1.241-1.846 1.83-.193.186-.33.33-.32.526.004.043.013.107.03.155.02.054.04.1.05.111l.012.011c.18.118.31.2.31.2l.06.05c.193.16.318.282.452.395.13.11.281.214.41.214.18 0 .29-.165.36-.39.18-.65.4-1.71.42-1.81.03-.14.02-.27-.03-.36-.05-.09-.16-.13-.27-.13z"/></svg>
-          TELEGRAM
+        <a class="p-btn p-btn-dark" href="${playerTelegram}" target="_blank" rel="noopener">
+          <span class="p-ico-tg">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="#fff"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+          </span>
+          <span class="p-txt">TELEGRAM</span>
         </a>`;
   }
 
   if (playerX) {
     butonlarHtml += `
-        <a class="p-btn p-btn-x" href="${playerX}" target="_blank" rel="noopener">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="11" height="11" fill="#fff"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-5.094l-3.97-4.804-4.034 4.804H.448l5.547-6.65L0 .75h5.117l3.595 4.39L12.6.75z"/></svg>
-          X
+        <a class="p-btn p-btn-dark" href="${playerX}" target="_blank" rel="noopener">
+          <span class="p-ico-x">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="11" height="11" fill="#fff"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-5.094l-3.97-4.804-4.034 4.804H.448l5.547-6.65L0 .75h5.117l3.595 4.39L12.6.75z"/></svg>
+          </span>
+          <span class="p-txt">X</span>
         </a>`;
   }
 
   if (playerEkstraLink) {
     butonlarHtml += `
         <a class="p-btn p-btn-ekstra" href="${playerEkstraLink}" target="_blank" rel="noopener">
-          ${playerEkstraAd ? playerEkstraAd : "TIKLA"}
+          <span class="p-txt">${playerEkstraAd ? playerEkstraAd : "TIKLA"}</span>
         </a>`;
   }
 
@@ -226,47 +230,82 @@ export async function onRequest(context) {
 
 
 
-      /* ============================= */
-      /* PLAYER ÜSTÜ BUTONLAR (eski stil) */
-      /* ============================= */
+      /* ================================== */
+      /* PLAYER ÜSTÜ BUTONLAR (görsele göre) */
+      /* ================================== */
       #player-buttons {
         position: absolute;
-        top: 10px;
-        ${playerButonKonum === "sol" ? "left: 10px;" : "right: 10px;"}
+        top: 8px;
+        ${playerButonKonum === "sol" ? "left: 8px;" : "right: 8px;"}
         z-index: 2147483647; /* Tam ekranda da en üstte kalsın */
         display: flex;
-        gap: 6px;
+        gap: 8px;
         align-items: center;
-        font-family: Arial, sans-serif;
+        font-family: Arial, Helvetica, sans-serif;
       }
 
       .p-btn {
         display: inline-flex;
         align-items: center;
-        gap: 5px;
+        gap: 8px;
         color: #fff;
         text-decoration: none;
-        font-size: 11px;
-        font-weight: 800;
-        letter-spacing: 0.4px;
-        text-transform: uppercase;
-        padding: 6px 10px;
-        border-radius: 6px;
+        padding: 8px 14px;
+        border-radius: 10px;
         line-height: 1;
         white-space: nowrap;
-        opacity: 0.95;
-        transition: opacity 0.15s ease, transform 0.15s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        transition: transform 0.15s ease, filter 0.15s ease;
       }
 
-      .p-btn:hover { opacity: 1; transform: scale(1.05); }
+      .p-btn:hover { transform: scale(1.04); filter: brightness(1.15); }
 
-      .p-btn-tg     { background: #229ED9; }
-      .p-btn-x      { background: #000; border: 1px solid rgba(255,255,255,0.35); }
-      .p-btn-ekstra { background: ${ekstraButonRenk}; }
+      /* Yazı stili: görseldeki gibi kalın + hafif eğik + büyük harf */
+      .p-txt {
+        font-size: 13px;
+        font-weight: 800;
+        font-style: italic;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+      }
+
+      /* Telegram ve X: siyah zemin (görseldeki gibi) */
+      .p-btn-dark {
+        background: #0b0b0b;
+        border: 1px solid rgba(255,255,255,0.12);
+      }
+
+      /* Telegram'ın mavi yuvarlak ikonu */
+      .p-ico-tg {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #229ED9;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      /* X ikonu */
+      .p-ico-x {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      /* Ekstra buton: rengi panelden (ayar_btncolor) */
+      .p-btn-ekstra {
+        background: ${ekstraButonRenk};
+        border-radius: 8px; /* görseldeki gibi biraz daha köşeli */
+      }
 
       /* Küçük ekranlarda butonlar biraz ufalsın */
       @media (max-width: 480px) {
-        .p-btn { font-size: 9px; padding: 4px 7px; }
+        .p-btn { padding: 5px 9px; gap: 5px; }
+        .p-txt { font-size: 10px; }
+        .p-ico-tg { width: 15px; height: 15px; }
       }
 
       
