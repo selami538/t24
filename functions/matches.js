@@ -49,7 +49,7 @@ export async function onRequest(context) {
   <head>
     <meta charset="UTF-8">
     <style>
-      html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
+      body { margin: 0; padding: 0; background: #000; }
       #player { width: 100%; height: 100vh; position: relative; }
 
       /* YAYIN EKRANI KÜÇÜLMESİN: Clappr player ve video her zaman tam boy */
@@ -60,10 +60,10 @@ export async function onRequest(context) {
       #player [data-player] video {
         width: 100% !important;
         height: 100% !important;
-        object-fit: fill; /* Görüntüyü kesmez ve siyah boşluk bırakmaz (görüntüyü alana göre esnetir) */
+        object-fit: fill;
       }
 
-      /* ARKAPLAN: Clappr poster yerine kendi katmanımız */
+      /* ARKAPLAN: kendi poster katmanımız */
       #custom-poster {
         position: absolute;
         inset: 0;
@@ -71,12 +71,12 @@ export async function onRequest(context) {
         background-color: #000;
         background-position: center;
         background-repeat: no-repeat;
-        background-size: contain; 
+        background-size: contain;
         pointer-events: none;
         display: none;
       }
 
-      /* YÜKLENİYOR: Clappr'ın orijinal spinner-three-bounce animasyonunun aynısı */
+      /* YÜKLENİYOR: Clappr'ın spinner-three-bounce animasyonunun aynısı */
       #loading-spinner {
         position: absolute;
         top: 50%;
@@ -125,7 +125,9 @@ export async function onRequest(context) {
         z-index: 9999;
       }
 
-      #ad-timer { bottom: 40px; }
+      #ad-timer {
+        bottom: 40px;
+      }
 
       #skip-btn {
         bottom: 10px;
@@ -133,7 +135,7 @@ export async function onRequest(context) {
         cursor: pointer;
         background: #d33;
       }
-      
+
       /* Üstteki kırmızı çizgi/bar */
       #player [data-player] [data-border],
       #player [data-player] .player-border {
@@ -148,17 +150,17 @@ export async function onRequest(context) {
         display: none !important;
       }
 
-      /* Ses çizgisi görünür kalsın (garanti olsun diye geri açıyoruz) */
+      /* Ses çizgisi görünür kalsın */
       #player [data-player] .media-control .bar-container[data-volume],
       #player [data-player] .drawer-container[data-volume],
       #player [data-player] .segmented-bar-element {
         display: block !important;
       }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="/assets/js/clappr.js"></script>
-  </head>
+<script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="/assets/js/clappr.js"></script>
+</head>
   <body>
     <div id="player">
       <div id="custom-poster"></div>
@@ -170,171 +172,165 @@ export async function onRequest(context) {
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
     </div>
-    <script>
-      const id = "${id}";
-      const reklamVideo = "${reklamVideo}";
-      const reklamSure = ${reklamSure};
-      const reklamDurum = ${reklamDurum};
-      const playerPoster = "${playerPoster}";
-      let adPlayer = null;
-      let mainPlayer = null;
-      let countdown = null;
+   <script>
+  const id = "${id}";
+  const reklamVideo = "${reklamVideo}";
+  const reklamSure = ${reklamSure};
+  const reklamDurum = ${reklamDurum};
+  const playerPoster = "${playerPoster}";
+  let adPlayer = null;
+  let countdown = null;
 
-      // Kendi poster katmanımızı göster
-      function showPoster() {
-        if (!playerPoster) return;
-        const p = document.getElementById("custom-poster");
-        p.style.backgroundImage = "url('" + playerPoster + "')";
-        p.style.display = "block";
-      }
-      function hidePoster() {
-        document.getElementById("custom-poster").style.display = "none";
-      }
+  function showPoster() {
+    if (!playerPoster) return;
+    const p = document.getElementById("custom-poster");
+    p.style.backgroundImage = "url('" + playerPoster + "')";
+    p.style.display = "block";
+  }
+  function hidePoster() {
+    document.getElementById("custom-poster").style.display = "none";
+  }
+  function showLoading() {
+    document.getElementById("loading-spinner").style.display = "block";
+  }
+  function hideLoading() {
+    document.getElementById("loading-spinner").style.display = "none";
+  }
 
-      // Yükleniyor animasyonu (Clappr spinner'ının aynısı)
-      function showLoading() {
-        document.getElementById("loading-spinner").style.display = "block";
-      }
-      function hideLoading() {
-        document.getElementById("loading-spinner").style.display = "none";
-      }
+  function startMainPlayer(mainUrl) {
+    mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
+    const options = {
+      source: mainUrl,
+      parentId: "#player",
+      autoPlay: true,
+      width: "100%",
+      height: "100%",
+      mimeType: "application/x-mpegURL"
+    };
 
-      function startMainPlayer(mainUrl) {
-        mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
-        const options = {
-          source: mainUrl,
-          parentId: "#player",
-          autoPlay: true,
-          width: "100%",
-          height: "100%",
-          mimeType: "application/x-mpegURL"
-        };
+    ${playerLogo ? `options.watermark = "${playerLogo}";` : ""}
+    ${playerSite ? `options.watermarkLink = "${playerSite}";` : ""}
+    ${playerLogoyer ? `options.position = "${playerLogoyer}";` : ""}
 
-        ${playerLogo ? `options.watermark = "${playerLogo}";` : ""}
-        ${playerSite ? `options.watermarkLink = "${playerSite}";` : ""}
-        ${playerLogoyer ? `options.position = "${playerLogoyer}";` : ""}
+    const p = new Clappr.Player(options);
 
-        mainPlayer = new Clappr.Player(options);
+    p.on(Clappr.Events.PLAYER_PLAY, function() {
+      hidePoster();
+      hideLoading();
+      p.resize({ width: "100%", height: "100%" });
+    });
 
-        // Yayın oynamaya başlayınca posteri ve spinner'ı kaldır, boyutu tazele
-        mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
-          hidePoster();
-          hideLoading();
-          mainPlayer.resize({ width: "100%", height: "100%" });
-        });
+    window.addEventListener("resize", function() {
+      p.resize({ width: "100%", height: "100%" });
+    });
+  }
 
-        // Pencere boyutu değişince player'ı da uydur
-        window.addEventListener("resize", function() {
-          if (mainPlayer) mainPlayer.resize({ width: "100%", height: "100%" });
-        });
-      }
+  function skipAd() {
+    if (adPlayer) adPlayer.destroy();
+    clearInterval(countdown);
+    document.getElementById("ad-timer").style.display = "none";
+    document.getElementById("skip-btn").style.display = "none";
+    startMainPlayer(window.mainStreamUrl);
+  }
 
-      function skipAd() {
-        if (adPlayer) adPlayer.destroy();
-        adPlayer = null;
-        clearInterval(countdown);
-        document.getElementById("ad-timer").style.display = "none";
-        document.getElementById("skip-btn").style.display = "none";
-        startMainPlayer(window.mainStreamUrl);
-      }
+  function startAdThenMain(mainUrl) {
+    mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
+    window.mainStreamUrl = mainUrl;
 
-      function startAdThenMain(mainUrl) {
-        mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
-        window.mainStreamUrl = mainUrl;
-
-        if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
-          hidePoster();
-          hideLoading();
-          adPlayer = new Clappr.Player({
-            source: reklamVideo,
-            parentId: "#player",
-            autoPlay: true,
-            width: "100%",
-            height: "100%"
-          });
-
-          const timerDiv = document.getElementById("ad-timer");
-          const skipBtn = document.getElementById("skip-btn");
-
-          let remaining = reklamSure;
-          timerDiv.style.display = "block";
-          timerDiv.innerText = "Reklamın bitmesine kalan süre: " + remaining + " saniye";
-
-          countdown = setInterval(() => {
-            remaining--;
-            if (remaining <= 0) {
-              clearInterval(countdown);
-              adPlayer.destroy();
-              adPlayer = null;
-              timerDiv.style.display = "none";
-              skipBtn.style.display = "none";
-              startMainPlayer(mainUrl);
-            } else {
-              timerDiv.innerText = "Reklamın bitmesine kalan süre: " + remaining + " saniye";
-              if (remaining <= reklamSure - 5) skipBtn.style.display = "block";
-            }
-          }, 1000);
-        } else {
-          startMainPlayer(mainUrl);
-        }
-      }
-
-      async function loadStream(id) {
-        if (!id) {
-          document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:20px'>ID eksik</h2>";
-          return;
-        }
-
-        showPoster(); // yayın gelene kadar arkaplan görünsün
-        showLoading(); // Clappr tarzı üç nokta spinner
-
-        try {
-          const [analyticsRes, cinemaRes] = await Promise.allSettled([
-            fetch("https://teletv5.top/load/yayinlink.php?id=" + encodeURIComponent(id)),
-            fetch("https://streamsport365.com/cinema", {
-              method: "POST",
-              headers: { "Content-Type": "application/json", "Accept": "*/*" },
-              body: JSON.stringify({
-                AppId: "5000",
-                AppVer: "1",
-                VpcVer: "1.0.12",
-                Language: "en",
-                Token: "",
-                VideoId: id
-              })
-            })
-          ]);
-
-          let streamUrl = "";
-
-          if (analyticsRes.status === "fulfilled") {
-            const analyticsData = await analyticsRes.value.json();
-            if (analyticsData.deismackanal && analyticsData.deismackanal.includes("m3u8")) {
-              streamUrl = analyticsData.deismackanal;
-            }
-          }
-
-          if (!streamUrl && cinemaRes.status === "fulfilled") {
-            const cinemaData = await cinemaRes.value.json();
-            if (cinemaData.URL) streamUrl = cinemaData.URL;
-          }
-
-          if (streamUrl) {
-            startAdThenMain(streamUrl);
-          } else {
-            document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:20px'>Yayın bulunamadı</h2>";
-          }
-
-        } catch (err) {
-          console.error("Yayın yüklenirken hata:", err);
-          document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:20px'>Yayın hatası</h2>";
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", () => {
-        loadStream(id);
+    if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
+      hidePoster();
+      hideLoading();
+      adPlayer = new Clappr.Player({
+        source: reklamVideo,
+        parentId: "#player",
+        autoPlay: true,
+        width: "100%",
+        height: "100%"
       });
-    </script>
+
+      const timerDiv = document.getElementById("ad-timer");
+      const skipBtn = document.getElementById("skip-btn");
+
+      let remaining = reklamSure;
+      timerDiv.style.display = "block";
+      timerDiv.innerText = "Reklamın bitmesine kalan süre: " + remaining + " saniye";
+
+      countdown = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(countdown);
+          adPlayer.destroy();
+          timerDiv.style.display = "none";
+          skipBtn.style.display = "none";
+          startMainPlayer(mainUrl);
+        } else {
+          timerDiv.innerText = "Reklamın bitmesine kalan süre: " + remaining + " saniye";
+          if (remaining <= reklamSure - 5) skipBtn.style.display = "block";
+        }
+      }, 1000);
+    } else {
+      startMainPlayer(mainUrl);
+    }
+  }
+
+  async function loadStream(id) {
+    if (!id) {
+      document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:20px'>ID eksik</h2>";
+      return;
+    }
+
+    showPoster();
+    showLoading();
+
+    try {
+      // Analytics ve Cinema API paralel çalışıyor
+      const [analyticsRes, cinemaRes] = await Promise.allSettled([
+        fetch("https://teletv5.top/load/yayinlink.php?id=" + encodeURIComponent(id)),
+        fetch("https://streamsport365.com/cinema", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "*/*" },
+          body: JSON.stringify({
+            AppId: "5000",
+            AppVer: "1",
+            VpcVer: "1.0.12",
+            Language: "en",
+            Token: "",
+            VideoId: id
+          })
+        })
+      ]);
+
+      let streamUrl = "";
+
+      if (analyticsRes.status === "fulfilled") {
+        const analyticsData = await analyticsRes.value.json();
+        if (analyticsData.deismackanal && analyticsData.deismackanal.includes("m3u8")) {
+          streamUrl = analyticsData.deismackanal;
+        }
+      }
+
+      if (!streamUrl && cinemaRes.status === "fulfilled") {
+        const cinemaData = await cinemaRes.value.json();
+        if (cinemaData.URL) streamUrl = cinemaData.URL;
+      }
+
+      if (streamUrl) {
+        startAdThenMain(streamUrl);
+      } else {
+        document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:20px'>Yayın bulunamadı</h2>";
+      }
+
+    } catch (err) {
+      console.error("Yayın yüklenirken hata:", err);
+      document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:20px'>Yayın hatası</h2>";
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    loadStream(id);
+  });
+</script>
+
   </body>
 </html>
 `;
