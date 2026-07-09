@@ -48,7 +48,6 @@ export async function onRequest(context) {
 <html>
   <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
       html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
       #player { width: 100%; height: 100vh; position: relative; }
@@ -75,43 +74,6 @@ export async function onRequest(context) {
         background-size: contain; 
         pointer-events: none;
         display: none;
-      }
-
-      /* YÜKLENİYOR: Clappr'ın orijinal spinner-three-bounce animasyonunun aynısı */
-      #loading-spinner {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        display: none;
-        pointer-events: none;
-        text-align: center;
-      }
-      #loading-spinner > div {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        background-color: #FFFFFF;
-        border-radius: 100%;
-        -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-        animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-      }
-      #loading-spinner .bounce1 {
-        -webkit-animation-delay: -0.32s;
-        animation-delay: -0.32s;
-      }
-      #loading-spinner .bounce2 {
-        -webkit-animation-delay: -0.16s;
-        animation-delay: -0.16s;
-      }
-      @-webkit-keyframes loading-bouncedelay {
-        0%, 80%, 100% { -webkit-transform: scale(0); }
-        40% { -webkit-transform: scale(1); }
-      }
-      @keyframes loading-bouncedelay {
-        0%, 80%, 100% { transform: scale(0); }
-        40% { transform: scale(1); }
       }
 
       #ad-timer, #skip-btn {
@@ -163,11 +125,6 @@ export async function onRequest(context) {
   <body>
     <div id="player">
       <div id="custom-poster"></div>
-      <div id="loading-spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
-      </div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
     </div>
@@ -192,25 +149,12 @@ export async function onRequest(context) {
         document.getElementById("custom-poster").style.display = "none";
       }
 
-      // Yükleniyor animasyonu (Clappr spinner'ının aynısı)
-      function showLoading() {
-        document.getElementById("loading-spinner").style.display = "block";
-      }
-      function hideLoading() {
-        document.getElementById("loading-spinner").style.display = "none";
-      }
-
       function startMainPlayer(mainUrl) {
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
         const options = {
           source: mainUrl,
           parentId: "#player",
           autoPlay: true,
-          mute: false,
-          playback: {
-            playInline: true,
-            recycleVideo: true
-          },
           width: "100%",
           height: "100%",
           mimeType: "application/x-mpegURL"
@@ -222,53 +166,11 @@ export async function onRequest(context) {
 
         mainPlayer = new Clappr.Player(options);
 
-        // Yayın oynamaya başlayınca posteri ve spinner'ı kaldır, boyutu tazele
+        // Yayın oynamaya başlayınca posteri kaldır, boyutu tazele
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
           hidePoster();
-          hideLoading();
           mainPlayer.resize({ width: "100%", height: "100%" });
         });
-
-        // Mobilde otomatik oynatma engellenirse: spinner'ı kaldır,
-        // kullanıcı ekrana dokununca yayını başlat
-        mainPlayer.on(Clappr.Events.PLAYER_READY, function() {
-          setTimeout(function() {
-            if (mainPlayer && !mainPlayer.isPlaying()) {
-              // Sesli autoplay engellendi → sessiz başlatmayı dene
-              try {
-                mainPlayer.mute();
-                mainPlayer.play();
-              } catch (e) {}
-
-              // Hâlâ oynamıyorsa dokunma ile başlat
-              setTimeout(function() {
-                if (mainPlayer && !mainPlayer.isPlaying()) {
-                  hideLoading();
-                  const startOnTouch = function() {
-                    if (mainPlayer && !mainPlayer.isPlaying()) {
-                      mainPlayer.play();
-                    }
-                    document.removeEventListener("touchend", startOnTouch);
-                    document.removeEventListener("click", startOnTouch);
-                  };
-                  document.addEventListener("touchend", startOnTouch);
-                  document.addEventListener("click", startOnTouch);
-                }
-              }, 1500);
-            }
-          }, 1500);
-        });
-
-        // Sessiz başlatıldıysa kullanıcı dokununca sesi geri aç
-        const unmuteOnTouch = function() {
-          if (mainPlayer && mainPlayer.isPlaying()) {
-            mainPlayer.unmute();
-          }
-          document.removeEventListener("touchend", unmuteOnTouch);
-          document.removeEventListener("click", unmuteOnTouch);
-        };
-        document.addEventListener("touchend", unmuteOnTouch);
-        document.addEventListener("click", unmuteOnTouch);
 
         // Pencere boyutu değişince player'ı da uydur
         window.addEventListener("resize", function() {
@@ -291,12 +193,10 @@ export async function onRequest(context) {
 
         if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
           hidePoster();
-          hideLoading();
           adPlayer = new Clappr.Player({
             source: reklamVideo,
             parentId: "#player",
             autoPlay: true,
-            playback: { playInline: true },
             width: "100%",
             height: "100%"
           });
@@ -334,7 +234,6 @@ export async function onRequest(context) {
         }
 
         showPoster(); // yayın gelene kadar arkaplan görünsün
-        showLoading(); // Clappr tarzı üç nokta spinner
 
         try {
           const [analyticsRes, cinemaRes] = await Promise.allSettled([
