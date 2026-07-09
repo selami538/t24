@@ -48,6 +48,7 @@ export async function onRequest(context) {
 <html>
   <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <style>
       html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
       #player { width: 100%; height: 100vh; position: relative; }
@@ -205,6 +206,11 @@ export async function onRequest(context) {
           source: mainUrl,
           parentId: "#player",
           autoPlay: true,
+          mute: false,
+          playback: {
+            playInline: true,
+            recycleVideo: true
+          },
           width: "100%",
           height: "100%",
           mimeType: "application/x-mpegURL"
@@ -222,6 +228,47 @@ export async function onRequest(context) {
           hideLoading();
           mainPlayer.resize({ width: "100%", height: "100%" });
         });
+
+        // Mobilde otomatik oynatma engellenirse: spinner'ı kaldır,
+        // kullanıcı ekrana dokununca yayını başlat
+        mainPlayer.on(Clappr.Events.PLAYER_READY, function() {
+          setTimeout(function() {
+            if (mainPlayer && !mainPlayer.isPlaying()) {
+              // Sesli autoplay engellendi → sessiz başlatmayı dene
+              try {
+                mainPlayer.mute();
+                mainPlayer.play();
+              } catch (e) {}
+
+              // Hâlâ oynamıyorsa dokunma ile başlat
+              setTimeout(function() {
+                if (mainPlayer && !mainPlayer.isPlaying()) {
+                  hideLoading();
+                  const startOnTouch = function() {
+                    if (mainPlayer && !mainPlayer.isPlaying()) {
+                      mainPlayer.play();
+                    }
+                    document.removeEventListener("touchend", startOnTouch);
+                    document.removeEventListener("click", startOnTouch);
+                  };
+                  document.addEventListener("touchend", startOnTouch);
+                  document.addEventListener("click", startOnTouch);
+                }
+              }, 1500);
+            }
+          }, 1500);
+        });
+
+        // Sessiz başlatıldıysa kullanıcı dokununca sesi geri aç
+        const unmuteOnTouch = function() {
+          if (mainPlayer && mainPlayer.isPlaying()) {
+            mainPlayer.unmute();
+          }
+          document.removeEventListener("touchend", unmuteOnTouch);
+          document.removeEventListener("click", unmuteOnTouch);
+        };
+        document.addEventListener("touchend", unmuteOnTouch);
+        document.addEventListener("click", unmuteOnTouch);
 
         // Pencere boyutu değişince player'ı da uydur
         window.addEventListener("resize", function() {
@@ -249,6 +296,7 @@ export async function onRequest(context) {
             source: reklamVideo,
             parentId: "#player",
             autoPlay: true,
+            playback: { playInline: true },
             width: "100%",
             height: "100%"
           });
