@@ -133,22 +133,6 @@ export async function onRequest(context) {
         cursor: pointer;
         background: #d33;
       }
-
-      /* SES AÇ butonu (mobilde sessiz autoplay sonrası) */
-      #unmute-btn {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        background: rgba(0,0,0,0.75);
-        color: #fff;
-        padding: 8px 14px;
-        border-radius: 8px;
-        font-family: Arial, sans-serif;
-        font-size: 14px;
-        z-index: 9999;
-        cursor: pointer;
-        display: none;
-      }
       
       /* Üstteki kırmızı çizgi/bar */
       #player [data-player] [data-border],
@@ -171,7 +155,7 @@ export async function onRequest(context) {
         display: block !important;
       }
     </style>
-    <script src="https://cdn.jsdelivr.net/gh/clappr/clappr@latest/dist/clappr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="/assets/js/clappr.js"></script>
   </head>
@@ -185,7 +169,6 @@ export async function onRequest(context) {
       </div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
-      <div id="unmute-btn" onclick="unmutePlayer()">🔊 Sesi Aç</div>
     </div>
     <script>
       const id = "${id}";
@@ -196,7 +179,6 @@ export async function onRequest(context) {
       let adPlayer = null;
       let mainPlayer = null;
       let countdown = null;
-      let soundUnlocked = false;
 
       // Kendi poster katmanımızı göster
       function showPoster() {
@@ -217,43 +199,12 @@ export async function onRequest(context) {
         document.getElementById("loading-spinner").style.display = "none";
       }
 
-      // SES: aktif player'ın sesini aç
-      function unmutePlayer() {
-        soundUnlocked = true;
-        const active = mainPlayer || adPlayer;
-        if (active) {
-          active.unmute();
-          active.setVolume(100);
-        }
-        document.getElementById("unmute-btn").style.display = "none";
-      }
-
-      // İlk dokunuş/tıklamada sesi otomatik aç
-      function unlockOnFirstTouch() {
-        if (!soundUnlocked) unmutePlayer();
-        document.removeEventListener("touchstart", unlockOnFirstTouch);
-        document.removeEventListener("click", unlockOnFirstTouch);
-      }
-      document.addEventListener("touchstart", unlockOnFirstTouch);
-      document.addEventListener("click", unlockOnFirstTouch);
-
-      function showUnmuteBtnIfMuted() {
-        if (!soundUnlocked) {
-          document.getElementById("unmute-btn").style.display = "block";
-        }
-      }
-
       function startMainPlayer(mainUrl) {
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
         const options = {
           source: mainUrl,
           parentId: "#player",
           autoPlay: true,
-          mute: !soundUnlocked, // mobilde autoplay için sessiz başla
-          playback: {
-            playInline: true,
-            recycleVideo: true
-          },
           width: "100%",
           height: "100%",
           mimeType: "application/x-mpegURL"
@@ -269,15 +220,8 @@ export async function onRequest(context) {
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
           hidePoster();
           hideLoading();
-          showUnmuteBtnIfMuted();
           mainPlayer.resize({ width: "100%", height: "100%" });
         });
-
-        // Ses zaten açılmışsa (reklam sırasında dokunduysa) sesli devam et
-        if (soundUnlocked) {
-          mainPlayer.unmute();
-          mainPlayer.setVolume(100);
-        }
 
         // Pencere boyutu değişince player'ı da uydur
         window.addEventListener("resize", function() {
@@ -305,16 +249,9 @@ export async function onRequest(context) {
             source: reklamVideo,
             parentId: "#player",
             autoPlay: true,
-            mute: !soundUnlocked, // reklam da sessiz başlasın ki takılmasın
-            playback: {
-              playInline: true,
-              recycleVideo: true
-            },
             width: "100%",
             height: "100%"
           });
-
-          showUnmuteBtnIfMuted();
 
           const timerDiv = document.getElementById("ad-timer");
           const skipBtn = document.getElementById("skip-btn");
