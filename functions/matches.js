@@ -58,11 +58,11 @@ export async function onRequest(context) {
 
       /* DÜZELTME: poster'ın kırpılmadan tamamının görünmesi için */
       .player-poster {
-        background-size: contain !important;
-        background-position: center !important;
-        background-repeat: no-repeat !important;
-        background-color: #000 !important;
-      }
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  background-color: #000 !important;
+}
 
       #ad-timer, #skip-btn {
         position: absolute;
