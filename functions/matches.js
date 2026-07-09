@@ -96,6 +96,20 @@ export async function onRequest(context) {
         cursor: pointer;
         background: #d33;
       }
+      /* Üstteki kırmızı çizgi/bar */
+#player [data-player] .media-control-layer .bar,
+#player [data-player] [data-border],
+#player [data-player] .player-border {
+  display: none !important;
+}
+
+/* Alttaki kontrol barının üstündeki kırmızı seek çizgisi */
+#player [data-player] .bar-container,
+#player [data-player] .media-control .bar-background,
+#player [data-player] .media-control .bar-fill-1,
+#player [data-player] .media-control .bar-fill-2 {
+  display: none !important;
+}
     </style>
     <script src="https://cdn.jsdelivr.net/gh/clappr/clappr@latest/dist/clappr.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
