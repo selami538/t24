@@ -107,6 +107,24 @@ export async function onRequest(context) {
         margin-left: 5px;
       }
 
+      /* TAM EKRAN BUTONU */
+      #fs-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        z-index: 9999;
+        background: rgba(0,0,0,0.6);
+        border: 1px solid rgba(255,255,255,0.4);
+        border-radius: 6px;
+        width: 40px;
+        height: 40px;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+      }
+      #fs-btn svg { width: 22px; height: 22px; fill: #fff; }
+
       /* YÜKLENİYOR: Clappr'ın orijinal spinner-three-bounce animasyonunun aynısı */
       #loading-spinner {
         position: absolute;
@@ -205,6 +223,9 @@ export async function onRequest(context) {
       </div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
+      <div id="fs-btn">
+        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+      </div>
     </div>
     <script>
       const id = "${id}";
@@ -235,6 +256,40 @@ export async function onRequest(context) {
         document.getElementById("loading-spinner").style.display = "none";
       }
 
+      // TAM EKRAN: Android'de container tam ekran + yatay, iPhone'da videonun native tam ekranı
+      let fsReady = false;
+      function setupFullscreen() {
+        if (fsReady) return;
+        fsReady = true;
+        const btn = document.getElementById("fs-btn");
+        btn.style.display = "flex";
+        btn.addEventListener("click", () => {
+          const container = document.getElementById("player");
+          const video = container.querySelector("video");
+
+          if (document.fullscreenElement || document.webkitFullscreenElement) {
+            // Zaten tam ekransa çık
+            if (document.exitFullscreen) document.exitFullscreen();
+            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+            return;
+          }
+
+          if (container.requestFullscreen) {
+            container.requestFullscreen();
+          } else if (container.webkitRequestFullscreen) {
+            container.webkitRequestFullscreen();
+          } else if (video && video.webkitEnterFullscreen) {
+            // iPhone Safari: sadece video kendi tam ekranına girebilir
+            video.webkitEnterFullscreen();
+          }
+
+          // Tam ekranda yatay moda çevir (destekleyen Android'lerde)
+          if (screen.orientation && screen.orientation.lock) {
+            screen.orientation.lock("landscape").catch(() => {});
+          }
+        });
+      }
+
       function startMainPlayer(mainUrl) {
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
         const options = {
@@ -257,6 +312,7 @@ export async function onRequest(context) {
           hidePoster();
           hideLoading();
           mainPlayer.resize({ width: "100%", height: "100%" });
+          setupFullscreen();
         });
 
         // Pencere boyutu değişince player'ı da uydur
