@@ -18,8 +18,6 @@ export async function onRequest(context) {
       if (json.playerlogo.player_logo) {
         playerLogo = json.playerlogo.player_logo;
       }
-      // DÜZELTME: Clappr "top-right" gibi İngilizce format bekliyor,
-      // bu yüzden player_logoyeriki değil player_logoyer okunuyor
       if (json.playerlogo.player_logoyer) {
         playerLogoyer = json.playerlogo.player_logoyer;
       }
@@ -32,12 +30,10 @@ export async function onRequest(context) {
       if (json.playerlogo.player_reklamsure) {
         reklamSure = parseInt(json.playerlogo.player_reklamsure) || 0;
       }
-      // DÜZELTME: pasif durumda "!1" geliyor, parseInt NaN döndürüyordu
       reklamDurum = json.playerlogo.player_reklamdurum === "1" ? 1 : 0;
 
       if (json.playerlogo.player_arkaplan) {
         playerPoster = json.playerlogo.player_arkaplan;
-        // Göreceli yol geldiyse kökten başlat (assets/img/... -> /assets/img/...)
         if (!/^https?:\/\//.test(playerPoster) && !playerPoster.startsWith("/")) {
           playerPoster = "/" + playerPoster;
         }
@@ -53,16 +49,32 @@ export async function onRequest(context) {
   <head>
     <meta charset="UTF-8">
     <style>
-      body { margin: 0; padding: 0; background: #000; }
+      html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
       #player { width: 100%; height: 100vh; position: relative; }
 
-      /* DÜZELTME: poster'ın kırpılmadan tamamının görünmesi için */
-      .player-poster {
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-  background-color: #000 !important;
-}
+      /* YAYIN EKRANI KÜÇÜLMESİN: Clappr player ve video her zaman tam boy */
+      #player [data-player] {
+        width: 100% !important;
+        height: 100% !important;
+      }
+      #player [data-player] video {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain;
+      }
+
+      /* ARKAPLAN: Clappr poster yerine kendi katmanımız */
+      #custom-poster {
+        position: absolute;
+        inset: 0;
+        z-index: 5;
+        background-color: #000;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: contain; /* tamamı görünsün; kaplasın istersen: cover */
+        pointer-events: none;
+        display: none;
+      }
 
       #ad-timer, #skip-btn {
         position: absolute;
@@ -76,9 +88,7 @@ export async function onRequest(context) {
         z-index: 9999;
       }
 
-      #ad-timer {
-        bottom: 40px;
-      }
+      #ad-timer { bottom: 40px; }
 
       #skip-btn {
         bottom: 10px;
@@ -93,6 +103,7 @@ export async function onRequest(context) {
   </head>
   <body>
     <div id="player">
+      <div id="custom-poster"></div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
     </div>
@@ -101,8 +112,21 @@ export async function onRequest(context) {
       const reklamVideo = "${reklamVideo}";
       const reklamSure = ${reklamSure};
       const reklamDurum = ${reklamDurum};
+      const playerPoster = "${playerPoster}";
       let adPlayer = null;
+      let mainPlayer = null;
       let countdown = null;
+
+      // Kendi poster katmanımızı göster
+      function showPoster() {
+        if (!playerPoster) return;
+        const p = document.getElementById("custom-poster");
+        p.style.backgroundImage = "url('" + playerPoster + "')";
+        p.style.display = "block";
+      }
+      function hidePoster() {
+        document.getElementById("custom-poster").style.display = "none";
+      }
 
       function startMainPlayer(mainUrl) {
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
@@ -118,13 +142,24 @@ export async function onRequest(context) {
         ${playerLogo ? `options.watermark = "${playerLogo}";` : ""}
         ${playerSite ? `options.watermarkLink = "${playerSite}";` : ""}
         ${playerLogoyer ? `options.position = "${playerLogoyer}";` : ""}
-        ${playerPoster ? `options.poster = "${playerPoster}";` : ""}
 
-        new Clappr.Player(options);
+        mainPlayer = new Clappr.Player(options);
+
+        // Yayın oynamaya başlayınca posteri kaldır, boyutu tazele
+        mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
+          hidePoster();
+          mainPlayer.resize({ width: "100%", height: "100%" });
+        });
+
+        // Pencere boyutu değişince player'ı da uydur
+        window.addEventListener("resize", function() {
+          if (mainPlayer) mainPlayer.resize({ width: "100%", height: "100%" });
+        });
       }
 
       function skipAd() {
         if (adPlayer) adPlayer.destroy();
+        adPlayer = null;
         clearInterval(countdown);
         document.getElementById("ad-timer").style.display = "none";
         document.getElementById("skip-btn").style.display = "none";
@@ -136,6 +171,7 @@ export async function onRequest(context) {
         window.mainStreamUrl = mainUrl;
 
         if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
+          hidePoster();
           adPlayer = new Clappr.Player({
             source: reklamVideo,
             parentId: "#player",
@@ -156,6 +192,7 @@ export async function onRequest(context) {
             if (remaining <= 0) {
               clearInterval(countdown);
               adPlayer.destroy();
+              adPlayer = null;
               timerDiv.style.display = "none";
               skipBtn.style.display = "none";
               startMainPlayer(mainUrl);
@@ -174,6 +211,8 @@ export async function onRequest(context) {
           document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:20px'>ID eksik</h2>";
           return;
         }
+
+        showPoster(); // yayın gelene kadar arkaplan görünsün
 
         try {
           const [analyticsRes, cinemaRes] = await Promise.allSettled([
