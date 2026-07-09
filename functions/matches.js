@@ -60,7 +60,7 @@ export async function onRequest(context) {
       #player [data-player] video {
         width: 100% !important;
         height: 100% !important;
-        object-fit: cover; /* BURASI DEĞİŞTİRİLDİ: Siyah boşlukları yok eder */
+        object-fit: fill; /* Görüntüyü kesmez ve siyah boşluk bırakmaz (görüntüyü alana göre esnetir) */
       }
 
       /* ARKAPLAN: Clappr poster yerine kendi katmanımız */
