@@ -76,6 +76,37 @@ export async function onRequest(context) {
         display: none;
       }
 
+      /* ORTADAKİ PLAY BUTONU */
+      #play-overlay {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        cursor: pointer;
+        background: rgba(0,0,0,0.3);
+      }
+      #play-overlay .play-btn {
+        width: 70px;
+        height: 70px;
+        background: rgba(0,0,0,0.7);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 3px solid rgba(255,255,255,0.8);
+        transition: transform 0.2s;
+      }
+      #play-overlay:active .play-btn,
+      #play-overlay:hover .play-btn { transform: scale(1.1); }
+      #play-overlay .play-btn svg {
+        width: 30px;
+        height: 30px;
+        fill: #fff;
+        margin-left: 5px;
+      }
+
       /* YÜKLENİYOR: Clappr'ın orijinal spinner-three-bounce animasyonunun aynısı */
       #loading-spinner {
         position: absolute;
@@ -162,6 +193,11 @@ export async function onRequest(context) {
   <body>
     <div id="player">
       <div id="custom-poster"></div>
+      <div id="play-overlay">
+        <div class="play-btn">
+          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+      </div>
       <div id="loading-spinner">
         <div class="bounce1"></div>
         <div class="bounce2"></div>
@@ -285,7 +321,6 @@ export async function onRequest(context) {
           return;
         }
 
-        showPoster(); // yayın gelene kadar arkaplan görünsün
         showLoading(); // Clappr tarzı üç nokta spinner
 
         try {
@@ -332,7 +367,13 @@ export async function onRequest(context) {
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        loadStream(id);
+        showPoster(); // buton beklerken arkaplan görünsün
+
+        const overlay = document.getElementById("play-overlay");
+        overlay.addEventListener("click", () => {
+          overlay.remove();
+          loadStream(id);
+        });
       });
     </script>
   </body>
