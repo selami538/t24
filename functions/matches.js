@@ -76,7 +76,7 @@ export async function onRequest(context) {
         display: none;
       }
 
-      /* ORTADAKİ PLAY BUTONU */
+      /* ORTADAKİ PLAY BUTONU (sadece mobilde gösterilir) */
       #play-overlay {
         position: absolute;
         inset: 0;
@@ -367,13 +367,22 @@ export async function onRequest(context) {
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        showPoster(); // buton beklerken arkaplan görünsün
+        showPoster();
 
+        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 1024);
         const overlay = document.getElementById("play-overlay");
-        overlay.addEventListener("click", () => {
+
+        if (isMobile) {
+          // Mobil: butona basınca başlat
+          overlay.addEventListener("click", () => {
+            overlay.remove();
+            loadStream(id);
+          });
+        } else {
+          // PC: buton yok, direkt başlat
           overlay.remove();
           loadStream(id);
-        });
+        }
       });
     </script>
   </body>
