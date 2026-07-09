@@ -76,6 +76,32 @@ export async function onRequest(context) {
         display: none;
       }
 
+      /* YÜKLENİYOR: üç nokta animasyonu */
+      #loading-dots {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 10;
+        display: none;
+        pointer-events: none;
+      }
+      #loading-dots span {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        margin: 0 6px;
+        background: #fff;
+        border-radius: 50%;
+        animation: dotPulse 1.2s infinite ease-in-out;
+      }
+      #loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+      #loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+      @keyframes dotPulse {
+        0%, 80%, 100% { transform: scale(0.4); opacity: 0.4; }
+        40% { transform: scale(1); opacity: 1; }
+      }
+
       #ad-timer, #skip-btn {
         position: absolute;
         right: 10px;
@@ -125,6 +151,7 @@ export async function onRequest(context) {
   <body>
     <div id="player">
       <div id="custom-poster"></div>
+      <div id="loading-dots"><span></span><span></span><span></span></div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
     </div>
@@ -149,6 +176,14 @@ export async function onRequest(context) {
         document.getElementById("custom-poster").style.display = "none";
       }
 
+      // Yükleniyor animasyonu
+      function showLoading() {
+        document.getElementById("loading-dots").style.display = "block";
+      }
+      function hideLoading() {
+        document.getElementById("loading-dots").style.display = "none";
+      }
+
       function startMainPlayer(mainUrl) {
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
         const options = {
@@ -166,9 +201,10 @@ export async function onRequest(context) {
 
         mainPlayer = new Clappr.Player(options);
 
-        // Yayın oynamaya başlayınca posteri kaldır, boyutu tazele
+        // Yayın oynamaya başlayınca posteri ve yükleniyor animasyonunu kaldır, boyutu tazele
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
           hidePoster();
+          hideLoading();
           mainPlayer.resize({ width: "100%", height: "100%" });
         });
 
@@ -193,6 +229,7 @@ export async function onRequest(context) {
 
         if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
           hidePoster();
+          hideLoading();
           adPlayer = new Clappr.Player({
             source: reklamVideo,
             parentId: "#player",
@@ -234,6 +271,7 @@ export async function onRequest(context) {
         }
 
         showPoster(); // yayın gelene kadar arkaplan görünsün
+        showLoading(); // üç nokta animasyonu
 
         try {
           const [analyticsRes, cinemaRes] = await Promise.allSettled([
