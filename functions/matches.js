@@ -77,7 +77,12 @@ export async function onRequest(context) {
         pointer-events: none;
         display: none;
       }
-
+/* Mobilde spinner gözükmesin (orada play butonu var) */
+      @media (pointer: coarse) {
+        #custom-spinner {
+          display: none !important;
+        }
+      }
       /* Poster üstünde görünen yükleme noktaları (Clappr tarzı) */
       #custom-spinner {
         position: absolute;
