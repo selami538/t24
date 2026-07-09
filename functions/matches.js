@@ -4,23 +4,20 @@ export async function onRequest(context) {
 
   const id = url.searchParams.get("id");
 
-
-
   let playerLogo = "";
-
   let playerLogoyer = "";
-
   let playerSite = "";
-
   let reklamVideo = "";
-
   let reklamSure = 0;
-
   let reklamDurum = 0;
-
   let playerPoster = "";
 
-
+  // YENİ: Buton bilgileri
+  let playerTelegram = "";
+  let playerX = "";
+  let playerEkstraAd = "";
+  let playerEkstraLink = "";
+  let playerButonKonum = "sag"; // sag = sağ üst, sol = sol üst
 
   try {
 
@@ -28,54 +25,47 @@ export async function onRequest(context) {
 
     const json = await res2.json();
 
-
-
     if (json.playerlogo) {
 
       if (json.playerlogo.player_logo) {
-
         playerLogo = json.playerlogo.player_logo;
-
       }
-
       if (json.playerlogo.player_logoyer) {
-
         playerLogoyer = json.playerlogo.player_logoyer;
-
       }
-
       if (json.playerlogo.player_site) {
-
         playerSite = json.playerlogo.player_site;
-
       }
-
       if (json.playerlogo.player_reklamvideo) {
-
         reklamVideo = json.playerlogo.player_reklamvideo;
-
       }
-
       if (json.playerlogo.player_reklamsure) {
-
         reklamSure = parseInt(json.playerlogo.player_reklamsure) || 0;
-
       }
-
       reklamDurum = json.playerlogo.player_reklamdurum === "1" ? 1 : 0;
 
-
-
       if (json.playerlogo.player_arkaplan) {
-
         playerPoster = json.playerlogo.player_arkaplan;
-
         if (!/^https?:\/\//.test(playerPoster) && !playerPoster.startsWith("/")) {
-
           playerPoster = "/" + playerPoster;
-
         }
+      }
 
+      // YENİ: Buton verilerini çek
+      if (json.playerlogo.player_telegram) {
+        playerTelegram = json.playerlogo.player_telegram;
+      }
+      if (json.playerlogo.player_x) {
+        playerX = json.playerlogo.player_x;
+      }
+      if (json.playerlogo.player_ekstra_ad) {
+        playerEkstraAd = json.playerlogo.player_ekstra_ad;
+      }
+      if (json.playerlogo.player_ekstra_link) {
+        playerEkstraLink = json.playerlogo.player_ekstra_link;
+      }
+      if (json.playerlogo.player_buton_konum === "sol") {
+        playerButonKonum = "sol";
       }
 
     }
@@ -86,7 +76,31 @@ export async function onRequest(context) {
 
   }
 
+  // YENİ: Butonların HTML'ini hazırla (sadece dolu olanlar eklenir)
+  let butonlarHtml = "";
 
+  if (playerTelegram) {
+    butonlarHtml += `
+        <a class="p-btn p-btn-tg" href="${playerTelegram}" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12" fill="#fff"><path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.287 5.906c-.778.324-2.334.994-4.666 2.01-.378.15-.577.298-.595.442-.03.243.275.339.69.47l.175.055c.408.133.958.288 1.243.294.26.006.549-.1.868-.32 2.179-1.471 3.304-2.214 3.374-2.227.05-.01.12-.022.166.022.047.044.042.124.037.146-.03.129-1.227 1.241-1.846 1.83-.193.186-.33.33-.32.526.004.043.013.107.03.155.02.054.04.1.05.111l.012.011c.18.118.31.2.31.2l.06.05c.193.16.318.282.452.395.13.11.281.214.41.214.18 0 .29-.165.36-.39.18-.65.4-1.71.42-1.81.03-.14.02-.27-.03-.36-.05-.09-.16-.13-.27-.13z"/></svg>
+          TELEGRAM
+        </a>`;
+  }
+
+  if (playerX) {
+    butonlarHtml += `
+        <a class="p-btn p-btn-x" href="${playerX}" target="_blank" rel="noopener">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="11" height="11" fill="#fff"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-5.094l-3.97-4.804-4.034 4.804H.448l5.547-6.65L0 .75h5.117l3.595 4.39L12.6.75z"/></svg>
+          X
+        </a>`;
+  }
+
+  if (playerEkstraLink) {
+    butonlarHtml += `
+        <a class="p-btn p-btn-ekstra" href="${playerEkstraLink}" target="_blank" rel="noopener">
+          ${playerEkstraAd ? playerEkstraAd : "TIKLA"}
+        </a>`;
+  }
 
   const html = `
 
@@ -194,6 +208,51 @@ export async function onRequest(context) {
 
       }
 
+
+
+      /* ============================= */
+      /* YENİ: PLAYER ÜSTÜ BUTONLAR    */
+      /* ============================= */
+      #player-buttons {
+        position: absolute;
+        top: 10px;
+        ${playerButonKonum === "sol" ? "left: 10px;" : "right: 10px;"}
+        z-index: 9998;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        font-family: Arial, sans-serif;
+      }
+
+      .p-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        color: #fff;
+        text-decoration: none;
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+        padding: 6px 10px;
+        border-radius: 6px;
+        line-height: 1;
+        white-space: nowrap;
+        opacity: 0.95;
+        transition: opacity 0.15s ease, transform 0.15s ease;
+      }
+
+      .p-btn:hover { opacity: 1; transform: scale(1.05); }
+
+      .p-btn-tg     { background: #229ED9; }
+      .p-btn-x      { background: #000; border: 1px solid rgba(255,255,255,0.35); }
+      .p-btn-ekstra { background: #e74c3c; }
+
+      /* Küçük ekranlarda butonlar biraz ufalsın */
+      @media (max-width: 480px) {
+        .p-btn { font-size: 9px; padding: 4px 7px; }
+      }
+
       
 
       /* Üstteki kırmızı çizgi/bar */
@@ -251,6 +310,9 @@ export async function onRequest(context) {
     <div id="player">
 
       <div id="custom-poster"></div>
+
+      <!-- YENİ: Butonlar -->
+      <div id="player-buttons">${butonlarHtml}</div>
 
       <div id="ad-timer" style="display: none;"></div>
 
