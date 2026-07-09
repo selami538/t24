@@ -74,19 +74,23 @@ export async function onRequest(context) {
         overflow: hidden;
       }
 
-      /* Clappr alanı tam ekran olsun */
+      /*
+        Sadece ana player/video alanını büyütüyoruz.
+        media-control alanına dokunmuyoruz.
+        Çünkü ses, canlı yazısı ve kontrol barını yukarı kaydıran şey oydu.
+      */
       #player [data-player],
       #player [data-player] .container,
       #player [data-player] .playback,
-      #player [data-player] .playback-wrapper,
-      #player [data-player] .media-control-layer,
-      #player .player-poster,
-      #player .media-control {
+      #player [data-player] .playback-wrapper {
         width: 100% !important;
         height: 100% !important;
       }
 
-      /* Siyah boşluğu kaldıran ana kısım */
+      /*
+        Siyah boşluğu azaltan kısım.
+        Sadece video için cover kullanıyoruz.
+      */
       #player video,
       #player [data-player] video {
         width: 100% !important;
@@ -95,7 +99,10 @@ export async function onRequest(context) {
         background: #000 !important;
       }
 
-      /* ARKAPLAN: yayın açılmadan önceki görsel */
+      /*
+        Player arkaplanı bozulmasın diye contain.
+        cover yaparsak görsel kırpılır veya bozuk görünür.
+      */
       #custom-poster {
         position: absolute;
         inset: 0;
@@ -103,7 +110,7 @@ export async function onRequest(context) {
         background-color: #000;
         background-position: center;
         background-repeat: no-repeat;
-        background-size: cover;
+        background-size: contain;
         pointer-events: none;
         display: none;
       }
@@ -132,13 +139,33 @@ export async function onRequest(context) {
         background: #d33;
       }
 
-      /* Üstteki kırmızı çizgi/bar */
+      /*
+        Kontrol barı normal yerinde kalsın.
+        Önceki kodda bunlara height:100% verdiğimiz için yukarı çıkmıştı.
+      */
+      #player [data-player] .media-control {
+        width: 100% !important;
+        height: auto !important;
+        bottom: 0 !important;
+        top: auto !important;
+      }
+
+      #player [data-player] .media-control-layer {
+        height: auto !important;
+      }
+
+      /*
+        Üstteki kırmızı çizgi/bar gizleme
+      */
       #player [data-player] [data-border],
       #player [data-player] .player-border {
         display: none !important;
       }
 
-      /* Sadece seek/progress çizgisini gizle — ses barına dokunma */
+      /*
+        Sadece seek/progress çizgisini gizle.
+        Ses barına dokunmuyoruz.
+      */
       #player [data-player] .media-control .bar-container[data-seekbar],
       #player [data-player] .media-control .bar-background[data-seekbar],
       #player [data-player] .media-control .bar-fill-1[data-seekbar],
@@ -146,7 +173,9 @@ export async function onRequest(context) {
         display: none !important;
       }
 
-      /* Ses çizgisi görünür kalsın */
+      /*
+        Ses çizgisi garanti görünür kalsın.
+      */
       #player [data-player] .media-control .bar-container[data-volume],
       #player [data-player] .drawer-container[data-volume],
       #player [data-player] .segmented-bar-element {
@@ -187,22 +216,21 @@ export async function onRequest(context) {
 
       function hidePoster() {
         const p = document.getElementById("custom-poster");
+
         if (p) {
           p.style.display = "none";
         }
       }
 
-      function forcePlayerSize(player) {
+      function resizePlayer(player) {
         if (!player) return;
 
-        setTimeout(function () {
-          try {
-            player.resize({
-              width: "100%",
-              height: "100%"
-            });
-          } catch (e) {}
-        }, 100);
+        try {
+          player.resize({
+            width: "100%",
+            height: "100%"
+          });
+        } catch (e) {}
       }
 
       function startMainPlayer(mainUrl) {
@@ -223,23 +251,17 @@ export async function onRequest(context) {
 
         mainPlayer = new Clappr.Player(options);
 
-        forcePlayerSize(mainPlayer);
-
         mainPlayer.on(Clappr.Events.PLAYER_READY, function () {
-          forcePlayerSize(mainPlayer);
+          resizePlayer(mainPlayer);
         });
 
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function () {
           hidePoster();
-          forcePlayerSize(mainPlayer);
-        });
-
-        mainPlayer.on(Clappr.Events.PLAYER_RESIZE, function () {
-          forcePlayerSize(mainPlayer);
+          resizePlayer(mainPlayer);
         });
 
         window.addEventListener("resize", function () {
-          forcePlayerSize(mainPlayer);
+          resizePlayer(mainPlayer);
         });
       }
 
@@ -273,7 +295,7 @@ export async function onRequest(context) {
             height: "100%"
           });
 
-          forcePlayerSize(adPlayer);
+          resizePlayer(adPlayer);
 
           const timerDiv = document.getElementById("ad-timer");
           const skipBtn = document.getElementById("skip-btn");
