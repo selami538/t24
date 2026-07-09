@@ -76,8 +76,8 @@ export async function onRequest(context) {
         display: none;
       }
 
-      /* YÜKLENİYOR: üç nokta animasyonu */
-      #loading-dots {
+      /* YÜKLENİYOR: Clappr'ın orijinal spinner-three-bounce animasyonunun aynısı */
+      #loading-spinner {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -85,21 +85,32 @@ export async function onRequest(context) {
         z-index: 10;
         display: none;
         pointer-events: none;
+        text-align: center;
       }
-      #loading-dots span {
+      #loading-spinner > div {
         display: inline-block;
-        width: 16px;
-        height: 16px;
-        margin: 0 6px;
-        background: #fff;
-        border-radius: 50%;
-        animation: dotPulse 1.2s infinite ease-in-out;
+        width: 18px;
+        height: 18px;
+        background-color: #FFFFFF;
+        border-radius: 100%;
+        -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
+        animation: loading-bouncedelay 1.4s infinite ease-in-out both;
       }
-      #loading-dots span:nth-child(2) { animation-delay: 0.2s; }
-      #loading-dots span:nth-child(3) { animation-delay: 0.4s; }
-      @keyframes dotPulse {
-        0%, 80%, 100% { transform: scale(0.4); opacity: 0.4; }
-        40% { transform: scale(1); opacity: 1; }
+      #loading-spinner .bounce1 {
+        -webkit-animation-delay: -0.32s;
+        animation-delay: -0.32s;
+      }
+      #loading-spinner .bounce2 {
+        -webkit-animation-delay: -0.16s;
+        animation-delay: -0.16s;
+      }
+      @-webkit-keyframes loading-bouncedelay {
+        0%, 80%, 100% { -webkit-transform: scale(0); }
+        40% { -webkit-transform: scale(1); }
+      }
+      @keyframes loading-bouncedelay {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
       }
 
       #ad-timer, #skip-btn {
@@ -151,7 +162,11 @@ export async function onRequest(context) {
   <body>
     <div id="player">
       <div id="custom-poster"></div>
-      <div id="loading-dots"><span></span><span></span><span></span></div>
+      <div id="loading-spinner">
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
+      </div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
     </div>
@@ -176,12 +191,12 @@ export async function onRequest(context) {
         document.getElementById("custom-poster").style.display = "none";
       }
 
-      // Yükleniyor animasyonu
+      // Yükleniyor animasyonu (Clappr spinner'ının aynısı)
       function showLoading() {
-        document.getElementById("loading-dots").style.display = "block";
+        document.getElementById("loading-spinner").style.display = "block";
       }
       function hideLoading() {
-        document.getElementById("loading-dots").style.display = "none";
+        document.getElementById("loading-spinner").style.display = "none";
       }
 
       function startMainPlayer(mainUrl) {
@@ -201,7 +216,7 @@ export async function onRequest(context) {
 
         mainPlayer = new Clappr.Player(options);
 
-        // Yayın oynamaya başlayınca posteri ve yükleniyor animasyonunu kaldır, boyutu tazele
+        // Yayın oynamaya başlayınca posteri ve spinner'ı kaldır, boyutu tazele
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
           hidePoster();
           hideLoading();
@@ -271,7 +286,7 @@ export async function onRequest(context) {
         }
 
         showPoster(); // yayın gelene kadar arkaplan görünsün
-        showLoading(); // üç nokta animasyonu
+        showLoading(); // Clappr tarzı üç nokta spinner
 
         try {
           const [analyticsRes, cinemaRes] = await Promise.allSettled([
