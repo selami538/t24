@@ -18,8 +18,8 @@ export async function onRequest(context) {
       if (json.playerlogo.player_logo) {
         playerLogo = json.playerlogo.player_logo;
       }
-      if (json.playerlogo.player_logoyer) {
-        playerLogoyer = json.playerlogo.player_logoyer;
+      if (json.playerlogo.player_logoyeriki) {
+        playerLogoyer = json.playerlogo.player_logoyeriki;
       }
       if (json.playerlogo.player_site) {
         playerSite = json.playerlogo.player_site;
@@ -28,15 +28,13 @@ export async function onRequest(context) {
         reklamVideo = json.playerlogo.player_reklamvideo;
       }
       if (json.playerlogo.player_reklamsure) {
-        reklamSure = parseInt(json.playerlogo.player_reklamsure) || 0;
+        reklamSure = parseInt(json.playerlogo.player_reklamsure);
       }
-      reklamDurum = json.playerlogo.player_reklamdurum === "1" ? 1 : 0;
-
+      if (json.playerlogo.player_reklamdurum) {
+        reklamDurum = parseInt(json.playerlogo.player_reklamdurum);
+      }
       if (json.playerlogo.player_arkaplan) {
         playerPoster = json.playerlogo.player_arkaplan;
-        if (!/^https?:\/\//.test(playerPoster) && !playerPoster.startsWith("/")) {
-          playerPoster = "/" + playerPoster;
-        }
       }
     }
   } catch (e) {
@@ -51,67 +49,6 @@ export async function onRequest(context) {
     <style>
       body { margin: 0; padding: 0; background: #000; }
       #player { width: 100%; height: 100vh; position: relative; }
-
-      /* YAYIN EKRANI KÜÇÜLMESİN: Clappr player ve video her zaman tam boy */
-      #player [data-player] {
-        width: 100% !important;
-        height: 100% !important;
-      }
-      #player [data-player] video {
-        width: 100% !important;
-        height: 100% !important;
-        object-fit: fill;
-      }
-
-      /* ARKAPLAN: kendi poster katmanımız */
-      #custom-poster {
-        position: absolute;
-        inset: 0;
-        z-index: 5;
-        background-color: #000;
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: contain;
-        pointer-events: none;
-        display: none;
-      }
-
-      /* YÜKLENİYOR: Clappr'ın spinner-three-bounce animasyonunun aynısı */
-      #loading-spinner {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        display: none;
-        pointer-events: none;
-        text-align: center;
-      }
-      #loading-spinner > div {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        background-color: #FFFFFF;
-        border-radius: 100%;
-        -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-        animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-      }
-      #loading-spinner .bounce1 {
-        -webkit-animation-delay: -0.32s;
-        animation-delay: -0.32s;
-      }
-      #loading-spinner .bounce2 {
-        -webkit-animation-delay: -0.16s;
-        animation-delay: -0.16s;
-      }
-      @-webkit-keyframes loading-bouncedelay {
-        0%, 80%, 100% { -webkit-transform: scale(0); }
-        40% { -webkit-transform: scale(1); }
-      }
-      @keyframes loading-bouncedelay {
-        0%, 80%, 100% { transform: scale(0); }
-        40% { transform: scale(1); }
-      }
 
       #ad-timer, #skip-btn {
         position: absolute;
@@ -135,27 +72,6 @@ export async function onRequest(context) {
         cursor: pointer;
         background: #d33;
       }
-
-      /* Üstteki kırmızı çizgi/bar */
-      #player [data-player] [data-border],
-      #player [data-player] .player-border {
-        display: none !important;
-      }
-
-      /* Sadece SEEK (ilerleme) çizgisini gizle — ses barına dokunma */
-      #player [data-player] .media-control .bar-container[data-seekbar],
-      #player [data-player] .media-control .bar-background[data-seekbar],
-      #player [data-player] .media-control .bar-fill-1[data-seekbar],
-      #player [data-player] .media-control .bar-fill-2[data-seekbar] {
-        display: none !important;
-      }
-
-      /* Ses çizgisi görünür kalsın */
-      #player [data-player] .media-control .bar-container[data-volume],
-      #player [data-player] .drawer-container[data-volume],
-      #player [data-player] .segmented-bar-element {
-        display: block !important;
-      }
     </style>
 <script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
 <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
@@ -163,12 +79,6 @@ export async function onRequest(context) {
 </head>
   <body>
     <div id="player">
-      <div id="custom-poster"></div>
-      <div id="loading-spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
-      </div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
     </div>
@@ -177,25 +87,8 @@ export async function onRequest(context) {
   const reklamVideo = "${reklamVideo}";
   const reklamSure = ${reklamSure};
   const reklamDurum = ${reklamDurum};
-  const playerPoster = "${playerPoster}";
   let adPlayer = null;
   let countdown = null;
-
-  function showPoster() {
-    if (!playerPoster) return;
-    const p = document.getElementById("custom-poster");
-    p.style.backgroundImage = "url('" + playerPoster + "')";
-    p.style.display = "block";
-  }
-  function hidePoster() {
-    document.getElementById("custom-poster").style.display = "none";
-  }
-  function showLoading() {
-    document.getElementById("loading-spinner").style.display = "block";
-  }
-  function hideLoading() {
-    document.getElementById("loading-spinner").style.display = "none";
-  }
 
   function startMainPlayer(mainUrl) {
     mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
@@ -211,18 +104,9 @@ export async function onRequest(context) {
     ${playerLogo ? `options.watermark = "${playerLogo}";` : ""}
     ${playerSite ? `options.watermarkLink = "${playerSite}";` : ""}
     ${playerLogoyer ? `options.position = "${playerLogoyer}";` : ""}
+    ${playerPoster ? `options.poster = "${playerPoster}";` : ""}
 
-    const p = new Clappr.Player(options);
-
-    p.on(Clappr.Events.PLAYER_PLAY, function() {
-      hidePoster();
-      hideLoading();
-      p.resize({ width: "100%", height: "100%" });
-    });
-
-    window.addEventListener("resize", function() {
-      p.resize({ width: "100%", height: "100%" });
-    });
+    new Clappr.Player(options);
   }
 
   function skipAd() {
@@ -238,8 +122,6 @@ export async function onRequest(context) {
     window.mainStreamUrl = mainUrl;
 
     if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
-      hidePoster();
-      hideLoading();
       adPlayer = new Clappr.Player({
         source: reklamVideo,
         parentId: "#player",
@@ -278,9 +160,6 @@ export async function onRequest(context) {
       document.body.innerHTML = "<h2 style='color:white;text-align:center;margin-top:20px'>ID eksik</h2>";
       return;
     }
-
-    showPoster();
-    showLoading();
 
     try {
       // Analytics ve Cinema API paralel çalışıyor
