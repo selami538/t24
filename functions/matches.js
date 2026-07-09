@@ -76,92 +76,6 @@ export async function onRequest(context) {
         display: none;
       }
 
-      /* ORTADAKİ PLAY BUTONU (sadece mobilde gösterilir) */
-      #play-overlay {
-        position: absolute;
-        inset: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        cursor: pointer;
-        background: rgba(0,0,0,0.3);
-      }
-      #play-overlay .play-btn {
-        width: 70px;
-        height: 70px;
-        background: rgba(0,0,0,0.7);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 3px solid rgba(255,255,255,0.8);
-        transition: transform 0.2s;
-      }
-      #play-overlay:active .play-btn,
-      #play-overlay:hover .play-btn { transform: scale(1.1); }
-      #play-overlay .play-btn svg {
-        width: 30px;
-        height: 30px;
-        fill: #fff;
-        margin-left: 5px;
-      }
-
-      /* TAM EKRAN BUTONU */
-      #fs-btn {
-        position: absolute;
-        top: 10px;
-        right: 10px;
-        z-index: 9999;
-        background: rgba(0,0,0,0.6);
-        border: 1px solid rgba(255,255,255,0.4);
-        border-radius: 6px;
-        width: 40px;
-        height: 40px;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-      }
-      #fs-btn svg { width: 22px; height: 22px; fill: #fff; }
-
-      /* YÜKLENİYOR: Clappr'ın orijinal spinner-three-bounce animasyonunun aynısı */
-      #loading-spinner {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        z-index: 10;
-        display: none;
-        pointer-events: none;
-        text-align: center;
-      }
-      #loading-spinner > div {
-        display: inline-block;
-        width: 18px;
-        height: 18px;
-        background-color: #FFFFFF;
-        border-radius: 100%;
-        -webkit-animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-        animation: loading-bouncedelay 1.4s infinite ease-in-out both;
-      }
-      #loading-spinner .bounce1 {
-        -webkit-animation-delay: -0.32s;
-        animation-delay: -0.32s;
-      }
-      #loading-spinner .bounce2 {
-        -webkit-animation-delay: -0.16s;
-        animation-delay: -0.16s;
-      }
-      @-webkit-keyframes loading-bouncedelay {
-        0%, 80%, 100% { -webkit-transform: scale(0); }
-        40% { -webkit-transform: scale(1); }
-      }
-      @keyframes loading-bouncedelay {
-        0%, 80%, 100% { transform: scale(0); }
-        40% { transform: scale(1); }
-      }
-
       #ad-timer, #skip-btn {
         position: absolute;
         right: 10px;
@@ -211,21 +125,8 @@ export async function onRequest(context) {
   <body>
     <div id="player">
       <div id="custom-poster"></div>
-      <div id="play-overlay">
-        <div class="play-btn">
-          <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </div>
-      </div>
-      <div id="loading-spinner">
-        <div class="bounce1"></div>
-        <div class="bounce2"></div>
-        <div class="bounce3"></div>
-      </div>
       <div id="ad-timer" style="display: none;"></div>
       <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
-      <div id="fs-btn">
-        <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-      </div>
     </div>
     <script>
       const id = "${id}";
@@ -248,48 +149,6 @@ export async function onRequest(context) {
         document.getElementById("custom-poster").style.display = "none";
       }
 
-      // Yükleniyor animasyonu (Clappr spinner'ının aynısı)
-      function showLoading() {
-        document.getElementById("loading-spinner").style.display = "block";
-      }
-      function hideLoading() {
-        document.getElementById("loading-spinner").style.display = "none";
-      }
-
-      // TAM EKRAN: Android'de container tam ekran + yatay, iPhone'da videonun native tam ekranı
-      let fsReady = false;
-      function setupFullscreen() {
-        if (fsReady) return;
-        fsReady = true;
-        const btn = document.getElementById("fs-btn");
-        btn.style.display = "flex";
-        btn.addEventListener("click", () => {
-          const container = document.getElementById("player");
-          const video = container.querySelector("video");
-
-          if (document.fullscreenElement || document.webkitFullscreenElement) {
-            // Zaten tam ekransa çık
-            if (document.exitFullscreen) document.exitFullscreen();
-            else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-            return;
-          }
-
-          if (container.requestFullscreen) {
-            container.requestFullscreen();
-          } else if (container.webkitRequestFullscreen) {
-            container.webkitRequestFullscreen();
-          } else if (video && video.webkitEnterFullscreen) {
-            // iPhone Safari: sadece video kendi tam ekranına girebilir
-            video.webkitEnterFullscreen();
-          }
-
-          // Tam ekranda yatay moda çevir (destekleyen Android'lerde)
-          if (screen.orientation && screen.orientation.lock) {
-            screen.orientation.lock("landscape").catch(() => {});
-          }
-        });
-      }
-
       function startMainPlayer(mainUrl) {
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
         const options = {
@@ -307,12 +166,10 @@ export async function onRequest(context) {
 
         mainPlayer = new Clappr.Player(options);
 
-        // Yayın oynamaya başlayınca posteri ve spinner'ı kaldır, boyutu tazele
+        // Yayın oynamaya başlayınca posteri kaldır, boyutu tazele
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
           hidePoster();
-          hideLoading();
           mainPlayer.resize({ width: "100%", height: "100%" });
-          setupFullscreen();
         });
 
         // Pencere boyutu değişince player'ı da uydur
@@ -336,7 +193,6 @@ export async function onRequest(context) {
 
         if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
           hidePoster();
-          hideLoading();
           adPlayer = new Clappr.Player({
             source: reklamVideo,
             parentId: "#player",
@@ -377,7 +233,7 @@ export async function onRequest(context) {
           return;
         }
 
-        showLoading(); // Clappr tarzı üç nokta spinner
+        showPoster(); // yayın gelene kadar arkaplan görünsün
 
         try {
           const [analyticsRes, cinemaRes] = await Promise.allSettled([
@@ -423,22 +279,7 @@ export async function onRequest(context) {
       }
 
       document.addEventListener("DOMContentLoaded", () => {
-        showPoster();
-
-        const isMobile = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent) || ('ontouchstart' in window && window.innerWidth < 1024);
-        const overlay = document.getElementById("play-overlay");
-
-        if (isMobile) {
-          // Mobil: butona basınca başlat
-          overlay.addEventListener("click", () => {
-            overlay.remove();
-            loadStream(id);
-          });
-        } else {
-          // PC: buton yok, direkt başlat
-          overlay.remove();
-          loadStream(id);
-        }
+        loadStream(id);
       });
     </script>
   </body>
