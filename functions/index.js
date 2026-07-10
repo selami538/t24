@@ -173,7 +173,7 @@ export async function onRequest(context) {
     logoheight:   ayar.logo_height || "",
     favicon:      ayar.ayar_favicon || "",
     amp:          ayar.amp_guncel || "",
-    canlisonuc:   playerlogo.iletisim_mesaj || "",
+    canlisonuc:   parseInt(ayar.ayar_skor ?? 0),
     twitter:      ayar.ayar_twitter || "",
     telegram:     ayar.ayar_telegram || "",
     facebook:     ayar.ayar_facebook || "",
@@ -592,7 +592,7 @@ ${reklam5 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${href
 <div class="footer-links">
 ${menuler.map(menu => `<a href="${menu.url}" target="_blank" rel="noopener">${menu.ad}</a>`).join("")}
 </div>
-${canlisonuc == 0 ? `<div style="position:relative;width:100%;height:150px;"><iframe src="https://www.sporx.com/_iframe/mac-merkezi/scoreboard.php" width="100%" height="100%" frameborder="0"></iframe><div style="position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999;"></div></div>` : ''}
+${canlisonuc === 0 ? `<div style="position:relative;width:100%;height:150px;"><iframe src="https://www.sporx.com/_iframe/mac-merkezi/scoreboard.php" width="100%" height="100%" frameborder="0"></iframe><div style="position:absolute;top:0;left:0;width:100%;height:100%;background:transparent;z-index:9999;"></div></div>` : ''}
 <center><img src="${logo}" width="${logowidth}" alt="logo"/></center>
 <div class="copyright-text"><p>${footermetin}</p></div>
 ${footerapi}
