@@ -254,15 +254,6 @@ export async function onRequest(context) {
         padding: 0 !important;
       }
 
-      /* Tam ekranda butonlar üst kenara yapışmasın */
-      .player-fullscreen-root {
-        position: relative !important;
-      }
-
-      #player-buttons.tam-ekran-butonlari {
-        top: 12px !important;
-      }
-
       #player-buttons .p-btn {
         display: inline-flex !important;
         align-items: center !important;
@@ -334,6 +325,16 @@ export async function onRequest(context) {
       #player-buttons .p-btn-ekstra {
         background: ${ekstraButonRenk} !important;
         border: 1px solid rgba(255,255,255,0.06) !important;
+      }
+
+      /* TAM EKRAN: butonlar en tepeye yapışmasın, yukarıdan biraz boşluk olsun */
+      :fullscreen #player-buttons {
+        top: 20px !important;
+        ${playerButonKonum === "sol" ? "left: 18px !important;" : "right: 18px !important;"}
+      }
+      :-webkit-full-screen #player-buttons {
+        top: 20px !important;
+        ${playerButonKonum === "sol" ? "left: 18px !important;" : "right: 18px !important;"}
       }
 
       /* Küçük ekranlarda butonlar biraz daha ufalsın */
@@ -437,29 +438,12 @@ export async function onRequest(context) {
       // ============================================
       function tamEkranButonDuzelt() {
         const btns = document.getElementById("player-buttons");
-        const playerEl = document.getElementById("player");
-        if (!btns || !playerEl) return;
-
+        if (!btns) return;
         const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
-
-        // Önceden eklenen tam ekran sınıfını temizle
-        document.querySelectorAll(".player-fullscreen-root").forEach(function(el) {
-          el.classList.remove("player-fullscreen-root");
-        });
-
         if (fsEl) {
-          fsEl.classList.add("player-fullscreen-root");
           fsEl.appendChild(btns);
-
-          // Tam ekranda ekranın üstünden 12 px boşluk bırak
-          btns.classList.add("tam-ekran-butonlari");
-          btns.style.setProperty("top", "12px", "important");
         } else {
-          playerEl.appendChild(btns);
-
-          // Normal görünümde eski 8 px değeri kullanılsın
-          btns.classList.remove("tam-ekran-butonlari");
-          btns.style.setProperty("top", "8px", "important");
+          document.getElementById("player").appendChild(btns);
         }
       }
       document.addEventListener("fullscreenchange", tamEkranButonDuzelt);
