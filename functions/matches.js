@@ -7,9 +7,6 @@ export async function onRequest(context) {
   let playerLogo = "";
   let playerLogoyer = "";
   let playerSite = "";
-  let reklamVideo = "";
-  let reklamSure = 0;
-  let reklamDurum = 0;
   // Buton bilgileri
   let playerTelegram = "";
   let playerX = "";
@@ -39,15 +36,7 @@ export async function onRequest(context) {
       if (json.playerlogo.player_site) {
         playerSite = json.playerlogo.player_site;
       }
-      if (json.playerlogo.player_reklamvideo) {
-        reklamVideo = json.playerlogo.player_reklamvideo;
-      }
-      if (json.playerlogo.player_reklamsure) {
-        reklamSure = parseInt(json.playerlogo.player_reklamsure) || 0;
-      }
-      reklamDurum = json.playerlogo.player_reklamdurum === "1" ? 1 : 0;
-
-      // Buton verileri
+// Buton verileri
       if (json.playerlogo.player_telegram) {
         playerTelegram = json.playerlogo.player_telegram;
       }
@@ -152,52 +141,7 @@ export async function onRequest(context) {
         object-fit: fill; /* Görüntüyü kesmez ve siyah boşluk bırakmaz (görüntüyü alana göre esnetir) */
 
       }
-
-
-
-      #ad-timer, #skip-btn {
-
-        position: absolute;
-
-        right: 10px;
-
-        background: rgba(0,0,0,0.75);
-
-        color: #fff;
-
-        padding: 8px 12px;
-
-        border-radius: 8px;
-
-        font-family: Arial, sans-serif;
-
-        font-size: 14px;
-
-        z-index: 9999;
-
-      }
-
-
-
-      #ad-timer { bottom: 40px; }
-
-
-
-      #skip-btn {
-
-        bottom: 10px;
-
-        display: none;
-
-        cursor: pointer;
-
-        background: #d33;
-
-      }
-
-
-
-      /* ============================================== */
+/* ============================================== */
       /* PLAYER ÜSTÜ BUTONLAR                           */
       /* NOT: Tam ekranda butonlar Clappr player'ın     */
       /* içine taşınıyor ve Clappr'ın kendi CSS'i bizim */
@@ -368,28 +312,18 @@ export async function onRequest(context) {
 
       <!-- Butonlar -->
       <div id="player-buttons">${butonlarHtml}</div>
-
-      <div id="ad-timer" style="display: none;"></div>
-
-      <div id="skip-btn" onclick="skipAd()">Reklamı Atla</div>
-
-    </div>
+</div>
 
     <script>
 
       const id = "${id}";
 
-      const reklamVideo = "${reklamVideo}";
 
-      const reklamSure = ${reklamSure};
 
-      const reklamDurum = ${reklamDurum};
 
-      let adPlayer = null;
 
       let mainPlayer = null;
 
-      let countdown = null;
 
 
 
@@ -472,7 +406,7 @@ export async function onRequest(context) {
 
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
 
-          // Önceki player/reklam sessiz kaldıysa ana yayında sesi geri aç.
+          // Tarayıcı veya önceki player sessiz bıraktıysa sesi geri aç.
           if (typeof mainPlayer.unmute === "function") {
             mainPlayer.unmute();
           }
@@ -495,151 +429,6 @@ export async function onRequest(context) {
         });
 
       }
-
-
-
-      function skipAd() {
-
-        if (adPlayer) adPlayer.destroy();
-
-        adPlayer = null;
-
-        clearInterval(countdown);
-
-        document.getElementById("ad-timer").style.display = "none";
-
-        document.getElementById("skip-btn").style.display = "none";
-
-        startMainPlayer(window.mainStreamUrl);
-
-      }
-
-
-
-      function startAdThenMain(mainUrl) {
-
-        mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
-
-        window.mainStreamUrl = mainUrl;
-
-
-
-        if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
-
-          adPlayer = new Clappr.Player({
-
-            source: reklamVideo,
-
-            parentId: "#player",
-
-            autoPlay: true,
-
-            mute: false,
-
-            volume: 100,
-
-            width: "100%",
-
-            height: "100%"
-
-          });
-
-
-
-          // Reklam kendi süresi doğal olarak biterse ana yayına geç
-
-          adPlayer.on(Clappr.Events.PLAYER_ENDED, function() {
-
-            skipAd();
-
-          });
-
-
-
-          const timerDiv = document.getElementById("ad-timer");
-
-          const skipBtn = document.getElementById("skip-btn");
-
-
-
-          skipBtn.style.display = "none";
-
-          timerDiv.style.display = "none";
-
-
-
-          // Sayaç, reklam GERÇEKTEN oynamaya başlayınca başlar.
-
-          // Böylece yükleme/buffer sırasında boşa saymaz.
-
-          let sayacBasladi = false;
-
-
-
-          function reklamSayaciniBaslat() {
-
-            if (sayacBasladi) return;   // Yalnızca bir kez başlat
-
-            sayacBasladi = true;
-
-
-
-            let remaining = reklamSure;
-
-            timerDiv.style.display = "block";
-
-            timerDiv.innerText = "Reklamı atlamak için kalan süre: " + remaining + " saniye";
-
-
-
-            countdown = setInterval(() => {
-
-              remaining--;
-
-              if (remaining <= 0) {
-
-                clearInterval(countdown);
-
-                timerDiv.style.display = "none";
-
-                // Süre tam dolunca "Reklamı Atla" butonu görünür.
-
-                skipBtn.style.display = "block";
-
-              } else {
-
-                timerDiv.innerText = "Reklamı atlamak için kalan süre: " + remaining + " saniye";
-
-              }
-
-            }, 1000);
-
-          }
-
-
-
-          // Reklam ilk kez oynamaya başladığında sayacı tetikle.
-
-          adPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
-            if (typeof adPlayer.unmute === "function") {
-              adPlayer.unmute();
-            }
-            if (typeof adPlayer.setVolume === "function") {
-              adPlayer.setVolume(100);
-            }
-
-            reklamSayaciniBaslat();
-          });
-
-        } else {
-
-          startMainPlayer(mainUrl);
-
-        }
-
-      }
-
-
 
       async function loadStream(id) {
 
@@ -717,7 +506,7 @@ export async function onRequest(context) {
 
           if (streamUrl) {
 
-            startAdThenMain(streamUrl);
+            startMainPlayer(streamUrl);
 
           } else {
 
