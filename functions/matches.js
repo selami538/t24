@@ -254,6 +254,15 @@ export async function onRequest(context) {
         padding: 0 !important;
       }
 
+      /* Tam ekranda butonlar üst kenara yapışmasın */
+      .player-fullscreen-root {
+        position: relative !important;
+      }
+
+      #player-buttons.tam-ekran-butonlari {
+        top: 12px !important;
+      }
+
       #player-buttons .p-btn {
         display: inline-flex !important;
         align-items: center !important;
@@ -428,12 +437,29 @@ export async function onRequest(context) {
       // ============================================
       function tamEkranButonDuzelt() {
         const btns = document.getElementById("player-buttons");
-        if (!btns) return;
+        const playerEl = document.getElementById("player");
+        if (!btns || !playerEl) return;
+
         const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+
+        // Önceden eklenen tam ekran sınıfını temizle
+        document.querySelectorAll(".player-fullscreen-root").forEach(function(el) {
+          el.classList.remove("player-fullscreen-root");
+        });
+
         if (fsEl) {
+          fsEl.classList.add("player-fullscreen-root");
           fsEl.appendChild(btns);
+
+          // Tam ekranda ekranın üstünden 12 px boşluk bırak
+          btns.classList.add("tam-ekran-butonlari");
+          btns.style.setProperty("top", "12px", "important");
         } else {
-          document.getElementById("player").appendChild(btns);
+          playerEl.appendChild(btns);
+
+          // Normal görünümde eski 8 px değeri kullanılsın
+          btns.classList.remove("tam-ekran-butonlari");
+          btns.style.setProperty("top", "8px", "important");
         }
       }
       document.addEventListener("fullscreenchange", tamEkranButonDuzelt);
