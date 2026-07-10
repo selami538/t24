@@ -68,7 +68,7 @@ export async function onRequest(context) {
     "bein-sports-5": "beinsports5.png",
     "bein-sports-max-1": "beinsportsmax1.png",
     "bein-sports-max-2": "beinsportsmax2.png",
-    "a-spor": "aspornnew.png",
+    "a-spor": "aspornew.png",
     "atv": "atv.png",
     "eurosport-1": "eurosport1.png",
     "eurosport-2": "eurosport2.png",
