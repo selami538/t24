@@ -255,15 +255,6 @@ function getTema2Html(params) {
       ).join('')
     : '<div class="t2-kanal-bos">API üzerinde gösterilecek TV kanalı bulunamadı.</div>';
 
-  // Mobilde player'ın hemen altında görünecek reklam bloğu (reklam2 + reklam5).
-  // PC'de bu blok gizlenir, reklamlar eski yerlerinde (grid dışında) kalır.
-  const mobilReklamHTML = (reklam2 || reklam5)
-    ? `<div class="mobil-player-reklam">
-${reklam2 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam2 ? `<a href="${hrefreklam2}" target="_blank"><img src="${reklam2}" alt="reklam"/></a>` : `<img src="${reklam2}" alt="reklam"/>`}</div>` : ''}
-${reklam5 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam5 ? `<a href="${hrefreklam5}" target="_blank"><img src="${reklam5}" alt="reklam"/></a>` : `<img src="${reklam5}" alt="reklam"/>`}</div>` : ''}
-</div>`
-    : '';
-
   return `<!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -301,10 +292,6 @@ ${reklam5 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${href
 .vertical-menu { background: rgba(35,41,47,.2); display: flex; flex-direction: column; align-items: center; padding: 10px 5px; border-radius: 10px; gap: 10px; position: sticky; top: 0; }
 .menu-item { width: 20px; height: 30px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
 .menu-item.active { opacity: 1; filter: brightness(1.5); }
-
-/* MOBIL PLAYER ALTI REKLAM: PC'de gizli, mobilde player'ın hemen altında */
-.mobil-player-reklam { display: none; }
-.mobil-player-reklam img { max-width: 100%; height: auto; }
 
 /* MAÇLAR / KANALLAR SEKME DURUMU */
 .head-grid .t2-tab {
@@ -425,14 +412,9 @@ ${reklam5 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${href
 
 /* MOBIL: tablo playerin altina insin */
 @media screen and (max-width: 1050px) {
-  .container-grid { grid-template-columns: 1fr; display: flex; flex-direction: column; }
+  .container-grid { grid-template-columns: 1fr; }
   .container-grid > * { max-width: 100%; min-width: 0; }
   .player-channel-area, .live-list { max-width: 100%; overflow-x: hidden; }
-
-  /* Mobilde sıralama: player -> reklamlar -> maç/kanal tablosu */
-  .container-grid > center { order: 1; }        /* Player */
-  .mobil-player-reklam { display: block; order: 2; margin: 8px 0; }  /* Reklam2 + Reklam5 */
-  .player-channel-area { order: 3; }            /* Tablo */
 }
 @media screen and (max-width: 600px) {
   .nomobile { display: none; }
@@ -492,7 +474,6 @@ ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a hre
 </div>
 </div>
 </center>
-${mobilReklamHTML}
 <div class="player-channel-area" style="width:100%;">
 <div class="live-list radarOn" style="width:100%;">
 <div class="head-grid" style="display:flex;justify-content:center;align-items:center;width:100%;">
@@ -606,6 +587,8 @@ function t2KanalSec(id, m3u8) {
   }
 }
 </script>
+${reklam2 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam2 ? `<a href="${hrefreklam2}" target="_blank"><img src="${reklam2}" alt="reklam"/></a>` : `<img src="${reklam2}" alt="reklam"/>`}</div>` : ''}
+${reklam5 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam5 ? `<a href="${hrefreklam5}" target="_blank"><img src="${reklam5}" alt="reklam"/></a>` : `<img src="${reklam5}" alt="reklam"/>`}</div>` : ''}
 <footer>
 <div class="footer-links">
 ${menuler.map(menu => `<a href="${menu.url}" target="_blank" rel="noopener">${menu.ad}</a>`).join("")}
