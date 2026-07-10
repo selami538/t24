@@ -354,7 +354,7 @@ export async function onRequest(context) {
 
     </style>
 
-    <script src="https://cdn.jsdelivr.net/gh/clappr/clappr@latest/dist/clappr.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
 
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 
@@ -442,6 +442,10 @@ export async function onRequest(context) {
 
           autoPlay: true,
 
+          mute: false,
+
+          volume: 100,
+
           width: "100%",
 
           height: "100%",
@@ -467,6 +471,14 @@ export async function onRequest(context) {
         // Yayın oynamaya başlayınca player boyutunu tazele
 
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
+
+          // Önceki player/reklam sessiz kaldıysa ana yayında sesi geri aç.
+          if (typeof mainPlayer.unmute === "function") {
+            mainPlayer.unmute();
+          }
+          if (typeof mainPlayer.setVolume === "function") {
+            mainPlayer.setVolume(100);
+          }
 
           mainPlayer.resize({ width: "100%", height: "100%" });
 
@@ -521,6 +533,10 @@ export async function onRequest(context) {
             parentId: "#player",
 
             autoPlay: true,
+
+            mute: false,
+
+            volume: 100,
 
             width: "100%",
 
@@ -604,7 +620,16 @@ export async function onRequest(context) {
 
           // Reklam ilk kez oynamaya başladığında sayacı tetikle.
 
-          adPlayer.on(Clappr.Events.PLAYER_PLAY, reklamSayaciniBaslat);
+          adPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
+            if (typeof adPlayer.unmute === "function") {
+              adPlayer.unmute();
+            }
+            if (typeof adPlayer.setVolume === "function") {
+              adPlayer.setVolume(100);
+            }
+
+            reklamSayaciniBaslat();
+          });
 
         } else {
 
