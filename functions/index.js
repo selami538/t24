@@ -602,8 +602,17 @@ function t2KanalSec(id, m3u8) {
   }
 }
 </script>
+<style>
+/* Mobilde gizli, sadece PC'de görünür */
+.masaustu-reklam-alt { display: block; }
+
+@media screen and (max-width: 1050px) {
+  .masaustu-reklam-alt { display: none; }
+} </style>
+<div class="masaustu-reklam-alt">
 ${reklam2 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam2 ? `<a href="${hrefreklam2}" target="_blank"><img src="${reklam2}" alt="reklam"/></a>` : `<img src="${reklam2}" alt="reklam"/>`}</div>` : ''}
 ${reklam5 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam5 ? `<a href="${hrefreklam5}" target="_blank"><img src="${reklam5}" alt="reklam"/></a>` : `<img src="${reklam5}" alt="reklam"/>`}</div>` : ''}
+</div>
 <footer>
 <div class="footer-links">
 ${menuler.map(menu => `<a href="${menu.url}" target="_blank" rel="noopener">${menu.ad}</a>`).join("")}
