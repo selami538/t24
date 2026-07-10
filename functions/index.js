@@ -47,6 +47,70 @@ export async function onRequest(context) {
   const ayar = json?.ayar || {};
   const playerlogo = json?.playerlogo || {};
 
+  // ===== API'DEKİ TV / SPOR KANALLARI =====
+  const apiOrigin = new URL(apiUrl).origin;
+
+  const tamUrlYap = (deger) => {
+    const value = String(deger || "").trim();
+    if (!value) return "";
+    if (/^https?:\/\//i.test(value)) return value;
+    return apiOrigin + "/" + value.replace(/^\/+/, "");
+  };
+
+  const gorselMi = (deger) => {
+    return /\.(webp|png|jpe?g|gif|svg)(?:\?.*)?$/i.test(String(deger || "").trim());
+  };
+
+  const kanalTekrarKontrol = new Set();
+
+  const apiKanallari = Array.isArray(json.player)
+    ? json.player
+        .filter(item => {
+          const tur = String(item?.tur || "").trim().toLowerCase();
+          const seo = String(item?.player_seo || "").trim();
+          const m3u8 = String(item?.player_m3u8 || "").trim();
+
+          return tur === "tv"
+            && seo !== ""
+            && seo !== "--"
+            && /^https?:\/\//i.test(m3u8)
+            && m3u8.toLowerCase().includes(".m3u8");
+        })
+        .sort((a, b) => {
+          const siraA = Number(a?.player_sira || 0);
+          const siraB = Number(b?.player_sira || 0);
+          return siraA - siraB;
+        })
+        .map(item => {
+          const seo = String(item.player_seo || "").trim();
+
+          if (kanalTekrarKontrol.has(seo)) return null;
+          kanalTekrarKontrol.add(seo);
+
+          const logoAdaylari = [
+            item.kanal_webp,
+            item.kanal_png,
+            item.player_logo
+          ];
+
+          const logo = logoAdaylari.find(gorselMi) || "";
+
+          return {
+            ad: String(
+              item.kanal_ad
+              || item.away
+              || item.home
+              || item.player_seo
+              || "Kanal"
+            ).trim(),
+            img: tamUrlYap(logo),
+            id: seo,
+            m3u8: String(item.player_m3u8 || "").trim()
+          };
+        })
+        .filter(Boolean)
+    : [];
+
   const params = {
     hostname,
     nextDomain,
@@ -84,6 +148,7 @@ export async function onRequest(context) {
     hrefreklam6:  ayar.ayar_footerlink || "",
     matchesUrl:   "https://teletv5.top/load/matches.php",
     channelsUrl:  "https://teletv5.top/load/channels.php",
+    kanallar:      apiKanallari,
     menuler: Array.isArray(json.menu)
       ? json.menu
           .filter(item => item.menu_durum === "1")
@@ -109,35 +174,36 @@ function getTema2Html(params) {
     headerapi, bodyapi, footerapi, analyticsapi, apilinkcikisi, pageskincolor,
     footermetin, reklam1, reklam2, reklam3, reklam4, reklam5, reklam6,
     hrefreklam1, hrefreklam2, hrefreklam4, hrefreklam5, hrefreklam6,
-    hrefpageskin, menuler, matchesUrl, channelsUrl
+    hrefpageskin, menuler, matchesUrl, channelsUrl, kanallar
   } = params;
 
-  const BASE = 'https://piabettv21.live';
+  const htmlEscape = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
 
-  const kanallar = [
-    { ad: "S Sport 1",     img: BASE + "/assets/v5/images/s-sport.webp",        id: "s-sport-1" },
-    { ad: "S Sport 2",     img: BASE + "/assets/v5/images/s-sport-2.webp",       id: "s-sport-2" },
-    { ad: "A SPOR",        img: BASE + "/assets/v5/images/a-spor.webp",          id: "a-spor" },
-    { ad: "SPORSMART",     img: BASE + "/assets/v5/images/spor-smart.webp",      id: "spor-smart" },
-    { ad: "Tivibu Spor 1", img: BASE + "/assets/v5/images/tivibu-spor-1.webp",   id: "tivibu-spor-1" },
-    { ad: "Tivibu Spor 2", img: BASE + "/assets/v5/images/tivibu-spor-2.webp",   id: "tivibu-spor-2" },
-    { ad: "Tivibu Spor 3", img: BASE + "/assets/v5/images/tivibu-spor-3.webp",   id: "tivibu-spor-3" },
-    { ad: "Bein Sports 1", img: BASE + "/assets/v5/images/bein-sports-1.webp",   id: "bein-sports-1" },
-    { ad: "Bein Sports 2", img: BASE + "/assets/v5/images/bein-sports-2.webp",   id: "bein-sports-2" },
-    { ad: "Bein Sports 3", img: BASE + "/assets/v5/images/bein-sports-3.webp",   id: "bein-sports-3" },
-    { ad: "Bein Sports 4", img: BASE + "/assets/v5/images/bein-sports-4.webp",   id: "bein-sports-4" },
-    { ad: "Bein Sports 5", img: BASE + "/assets/v5/images/bein-sports-5.webp",   id: "bein-sports-5" },
-    { ad: "BeIN Max 1",    img: BASE + "/assets/v5/images/bein-sports-max-1.webp", id: "bein-sports-max-1" },
-    { ad: "BeIN Max 2",    img: BASE + "/assets/v5/images/bein-sports-max-2.webp", id: "bein-sports-max-2" },
-    { ad: "TRT Spor",      img: BASE + "/assets/v5/images/trt-spor.webp",        id: "trt-spor" },
-    { ad: "TRT 1",         img: BASE + "/assets/v5/images/trt-1.webp",           id: "trt-1" },
-  ];
+  const jsDegeri = (value) => JSON.stringify(String(value ?? ""));
 
-  const kanalSliderHTML = kanallar.map(k =>
-    '<div class="t2-kanal-kart" data-kanal="' + k.id + '" onclick="t2KanalSec(\'' + k.id + '\')" title="' + k.ad + '">' +
-    '<img src="' + k.img + '" alt="' + k.ad + '" loading="lazy" onerror="this.style.display=\'none\'"/>' +
-    '</div>'
-  ).join('');
+  const varsayilanKanalId = kanallar.length
+    ? kanallar[0].id
+    : "bein-sports-1";
+
+  const kanalSliderHTML = kanallar.length
+    ? kanallar.map((k, index) =>
+        '<div class="t2-kanal-kart' + (index === 0 ? ' active' : '') + '"' +
+        ' data-kanal="' + htmlEscape(k.id) + '"' +
+        ' data-m3u8="' + htmlEscape(k.m3u8) + '"' +
+        ' onclick="t2KanalSec(' + jsDegeri(k.id) + ', ' + jsDegeri(k.m3u8) + ')"' +
+        ' title="' + htmlEscape(k.ad) + '">' +
+          (k.img
+            ? '<img src="' + htmlEscape(k.img) + '" alt="' + htmlEscape(k.ad) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"/>' +
+              '<span class="t2-kanal-ad" style="display:none;">' + htmlEscape(k.ad) + '</span>'
+            : '<span class="t2-kanal-ad">' + htmlEscape(k.ad) + '</span>') +
+        '</div>'
+      ).join('')
+    : '<div class="t2-kanal-bos">API üzerinde gösterilecek TV kanalı bulunamadı.</div>';
 
   return `<!DOCTYPE html>
 <html lang="tr">
@@ -222,6 +288,8 @@ function getTema2Html(params) {
 .t2-kanal-kart:hover { border-color: rgba(255,255,255,0.3); background: #22263a; }
 .t2-kanal-kart.active { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
 .t2-kanal-kart img { max-height: 42px; max-width: 120px; width: auto; object-fit: contain; }
+.t2-kanal-ad { color: #fff; font-size: 14px; font-weight: 500; text-align: center; white-space: nowrap; }
+.t2-kanal-bos { width: 100%; padding: 18px 10px; color: rgba(255,255,255,.65); text-align: center; }
 .t2-slider-btn { position: absolute; top: 50%; transform: translateY(-50%); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 5; transition: all 0.2s; user-select: none; line-height: 1; }
 .t2-slider-btn:hover { background: rgba(255,255,255,0.15); }
 .t2-slider-prev { left: 6px; }
@@ -279,7 +347,7 @@ ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a hre
 <div class="live-player" data-loadbalancer="1" data-loadbalancerdomain="osflare.work">
 <div class="player-attributes">
 <center>
-<iframe id="macth-video" name="macth-video" width="100%" height="450" scrolling="no" frameborder="0" src="matches?id=bein-sports-1" allowfullscreen=""></iframe>
+<iframe id="macth-video" name="macth-video" width="100%" height="450" scrolling="no" frameborder="0" src="matches?id=${encodeURIComponent(varsayilanKanalId)}" allowfullscreen=""></iframe>
 </center>
 </div>
 </div>
@@ -357,12 +425,26 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   });
 });
-function t2KanalSec(id) {
-  document.querySelectorAll('.t2-kanal-kart').forEach(function(k) { k.classList.remove('active'); });
-  var el = document.querySelector('.t2-kanal-kart[data-kanal="' + id + '"]');
+function t2KanalSec(id, m3u8) {
+  document.querySelectorAll('.t2-kanal-kart').forEach(function(k) {
+    k.classList.remove('active');
+  });
+
+  var el = Array.from(document.querySelectorAll('.t2-kanal-kart')).find(function(kart) {
+    return kart.dataset.kanal === String(id);
+  });
+
   if (el) el.classList.add('active');
+
   var iframe = document.getElementById('macth-video');
-  if (iframe) iframe.src = 'matches?id=' + id;
+
+  if (iframe) {
+    // Mevcut player yapısı id üzerinden açılmaya devam eder.
+    // API'den gelen gerçek m3u8 adresi de iframe üzerinde tutulur.
+    iframe.dataset.kanalId = String(id || '');
+    iframe.dataset.m3u8 = String(m3u8 || '');
+    iframe.src = 'matches?id=' + encodeURIComponent(id);
+  }
 }
 </script>
 ${reklam2 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam2 ? `<a href="${hrefreklam2}" target="_blank"><img src="${reklam2}" alt="reklam"/></a>` : `<img src="${reklam2}" alt="reklam"/>`}</div>` : ''}
