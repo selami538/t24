@@ -1,7 +1,6 @@
 export async function onRequest(context) {
   const { request } = context;
-  const url = new URL(request.url);
-  const baseUrl = `${url.protocol}//${url.hostname}`;
+  const baseUrl = request.headers.get("X-Public-Origin") || new URL(request.url).origin;
 
   // Statik ya da dinamik olarak ekleyebileceğin sayfalar
   const routes = ["/"];
