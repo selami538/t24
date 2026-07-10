@@ -22,7 +22,9 @@ export async function onRequest(context) {
 
   try {
 
-    const res2 = await fetch("https://origin.altinoksoft.com/api/verirepo.php");
+    const res2 = await fetch("https://origin.altinoksoft.com/api/verirepo.php", {
+  cf: { cacheTtl: 60, cacheEverything: true }
+});
 
     const json = await res2.json();
 
