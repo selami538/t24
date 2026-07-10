@@ -192,9 +192,11 @@ function getTema2Html(params) {
   color: inherit !important;
 }
 .head-grid .t2-tab .list-blink {
-  opacity: .28;
-  filter: grayscale(1);
-  transition: opacity .2s ease, filter .2s ease;
+  opacity: 1;
+  filter: none;
+  background: #ffffff !important;
+  box-shadow: 0 0 0 1px rgba(255,255,255,.12);
+  transition: background .2s ease, box-shadow .2s ease, opacity .2s ease, filter .2s ease;
 }
 .head-grid .t2-tab:hover {
   color: rgba(255,255,255,.72) !important;
@@ -208,6 +210,8 @@ function getTema2Html(params) {
 .head-grid .t2-tab.active .list-blink {
   opacity: 1;
   filter: none;
+  background: #ff2a3c !important;
+  box-shadow: 0 0 8px rgba(255,42,60,.35);
 }
 
 /* KANAL SLIDER */
