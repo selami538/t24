@@ -176,6 +176,40 @@ function getTema2Html(params) {
 .vertical-menu { background: rgba(35,41,47,.2); display: flex; flex-direction: column; align-items: center; padding: 10px 5px; border-radius: 10px; gap: 10px; position: sticky; top: 0; }
 .menu-item { width: 20px; height: 30px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
 .menu-item.active { opacity: 1; filter: brightness(1.5); }
+
+/* MAÇLAR / KANALLAR SEKME DURUMU */
+.head-grid .t2-tab {
+  position: relative;
+  padding: 16px 10px;
+  color: rgba(255,255,255,.42) !important;
+  font-weight: 500;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  transition: color .2s ease, background .2s ease, border-color .2s ease;
+}
+.head-grid .t2-tab span {
+  color: inherit !important;
+}
+.head-grid .t2-tab .list-blink {
+  opacity: .28;
+  filter: grayscale(1);
+  transition: opacity .2s ease, filter .2s ease;
+}
+.head-grid .t2-tab:hover {
+  color: rgba(255,255,255,.72) !important;
+  background: rgba(255,255,255,.025);
+}
+.head-grid .t2-tab.active {
+  color: #ffffff !important;
+  border-bottom-color: #49de80;
+  background: rgba(255,255,255,.045);
+}
+.head-grid .t2-tab.active .list-blink {
+  opacity: 1;
+  filter: none;
+}
+
 /* KANAL SLIDER */
 .t2-channel-area { position: relative; display: flex; align-items: center; border-top: 1px solid rgba(255,255,255,0.06); border-bottom: 1px solid rgba(255,255,255,0.06); padding: 0 44px; }
 .t2-channel-inner { display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; padding: 12px 0; flex: 1; }
@@ -249,8 +283,8 @@ ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a hre
 <div class="player-channel-area" style="width:100%;height:auto;">
 <div class="live-list radarOn" style="width:100%;">
 <div class="head-grid" style="display:flex;justify-content:center;align-items:center;width:100%;">
-<div class="active" id="live-tab" style="flex:1;text-align:center;cursor:pointer;"><div class="list-blink"></div><span>Maçlar</span></div>
-<div id="next-tab" style="flex:1;text-align:center;cursor:pointer;"><div class="list-blink"></div><span>Kanallar</span></div>
+<div class="t2-tab active" id="live-tab" style="flex:1;text-align:center;"><div class="list-blink"></div><span>Maçlar</span></div>
+<div class="t2-tab" id="next-tab" style="flex:1;text-align:center;"><div class="list-blink"></div><span>Kanallar</span></div>
 </div>
 <div class="search-container">
 <input type="text" id="matchSearchInput" placeholder="Maç veya kanal ara...">
@@ -285,14 +319,31 @@ ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a hre
 </div>
 </div>
 <script>
-document.getElementById('live-tab').addEventListener('click', function() {
-  document.getElementById('live-content').style.display = 'block';
-  document.getElementById('next-content').style.display = 'none';
+const liveTab = document.getElementById('live-tab');
+const nextTab = document.getElementById('next-tab');
+const liveContent = document.getElementById('live-content');
+const nextContent = document.getElementById('next-content');
+
+function t2SekmeAc(sekme) {
+  const maclarAcik = sekme === 'maclar';
+
+  liveContent.style.display = maclarAcik ? 'block' : 'none';
+  nextContent.style.display = maclarAcik ? 'none' : 'block';
+
+  liveTab.classList.toggle('active', maclarAcik);
+  nextTab.classList.toggle('active', !maclarAcik);
+}
+
+liveTab.addEventListener('click', function() {
+  t2SekmeAc('maclar');
 });
-document.getElementById('next-tab').addEventListener('click', function() {
-  document.getElementById('live-content').style.display = 'none';
-  document.getElementById('next-content').style.display = 'block';
+
+nextTab.addEventListener('click', function() {
+  t2SekmeAc('kanallar');
 });
+
+// Sayfa ilk açıldığında Maçlar aktif olsun.
+t2SekmeAc('maclar');
 document.addEventListener('DOMContentLoaded', function () {
   const searchInput = document.getElementById('matchSearchInput');
   searchInput.addEventListener('keyup', function () {
