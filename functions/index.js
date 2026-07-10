@@ -480,11 +480,11 @@ ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a hre
 .mobil-reklam-ust img { max-width: 100%; height: auto; }
 
 @media screen and (max-width: 1050px) {
-  .mobil-reklam-ust { display: block; margin: 8px 0; }
+  .mobil-reklam-ust { display: block; }
 } </style>
 
 <div class="mobil-reklam-ust">
-${reklam2 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam2 ? `<a href="${hrefreklam2}" target="_blank"><img src="${reklam2}" alt="reklam"/></a>` : `<img src="${reklam2}" alt="reklam"/>`}</div>` : ''}
+${reklam2 ? `<div style="max-width:100%;margin:10px;text-align:center;">${hrefreklam2 ? `<a href="${hrefreklam2}" target="_blank"><img src="${reklam2}" alt="reklam"/></a>` : `<img src="${reklam2}" alt="reklam"/>`}</div>` : ''}
 ${reklam5 ? `<div style="max-width:100%;margin:0 auto;text-align:center;">${hrefreklam5 ? `<a href="${hrefreklam5}" target="_blank"><img src="${reklam5}" alt="reklam"/></a>` : `<img src="${reklam5}" alt="reklam"/>`}</div>` : ''}
 </div>
 <div class="player-channel-area" style="width:100%;">
