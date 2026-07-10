@@ -342,6 +342,58 @@ function getTema2Html(params) {
 .t2-slider-btn:hover { background: rgba(255,255,255,0.15); }
 .t2-slider-prev { left: 6px; }
 .t2-slider-next { right: 6px; }
+
+/* SAĞ PANELİ PLAYER İLE AYNI YÜKSEKLİKTE TUT */
+.player-channel-area {
+  height: 450px !important;
+  min-height: 450px;
+  overflow: hidden;
+}
+
+.player-channel-area .live-list {
+  height: 450px !important;
+  min-height: 450px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.player-channel-area .head-grid,
+.player-channel-area .search-container {
+  flex: 0 0 auto;
+}
+
+/* Maçlar ve kanallar alanı kalan yüksekliği kullansın */
+#live-content,
+#next-content {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Kanal listesi ilk görseldeki gibi panel içinde kaydırılsın */
+#channels-content {
+  height: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.70) rgba(255,255,255,.12);
+}
+
+#channels-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+#channels-content::-webkit-scrollbar-track {
+  background: rgba(255,255,255,.12);
+}
+
+#channels-content::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,.70);
+  border-radius: 6px;
+}
+
 /* MOBIL: tablo playerin altina insin */
 @media screen and (max-width: 1050px) {
   .container-grid { grid-template-columns: 1fr; }
@@ -351,6 +403,12 @@ function getTema2Html(params) {
 @media screen and (max-width: 600px) {
   .nomobile { display: none; }
   #macth-video { height: 240px; }
+
+  .player-channel-area,
+  .player-channel-area .live-list {
+    height: 450px !important;
+    min-height: 450px;
+  }
 }
 </style>
 ${headerapi}
@@ -400,7 +458,7 @@ ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a hre
 </div>
 </div>
 </center>
-<div class="player-channel-area" style="width:100%;height:auto;">
+<div class="player-channel-area" style="width:100%;">
 <div class="live-list radarOn" style="width:100%;">
 <div class="head-grid" style="display:flex;justify-content:center;align-items:center;width:100%;">
 <div class="t2-tab active" id="live-tab" style="flex:1;text-align:center;"><div class="list-blink"></div><span>Maçlar</span></div>
