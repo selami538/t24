@@ -10,8 +10,6 @@ export async function onRequest(context) {
   let reklamVideo = "";
   let reklamSure = 0;
   let reklamDurum = 0;
-  let playerPoster = "";
-
   // Buton bilgileri
   let playerTelegram = "";
   let playerX = "";
@@ -46,13 +44,6 @@ export async function onRequest(context) {
         reklamSure = parseInt(json.playerlogo.player_reklamsure) || 0;
       }
       reklamDurum = json.playerlogo.player_reklamdurum === "1" ? 1 : 0;
-
-      if (json.playerlogo.player_arkaplan) {
-        playerPoster = json.playerlogo.player_arkaplan;
-        if (!/^https?:\/\//.test(playerPoster) && !playerPoster.startsWith("/")) {
-          playerPoster = "/" + playerPoster;
-        }
-      }
 
       // Buton verileri
       if (json.playerlogo.player_telegram) {
@@ -162,32 +153,6 @@ export async function onRequest(context) {
 
 
 
-      /* ARKAPLAN: Clappr poster yerine kendi katmanımız */
-
-      #custom-poster {
-
-        position: absolute;
-
-        inset: 0;
-
-        z-index: 5;
-
-        background-color: #000;
-
-        background-position: center;
-
-        background-repeat: no-repeat;
-
-        background-size: contain; 
-
-        pointer-events: none;
-
-        display: none;
-
-      }
-
-
-
       #ad-timer, #skip-btn {
 
         position: absolute;
@@ -252,6 +217,15 @@ export async function onRequest(context) {
         background: none !important;
         margin: 0 !important;
         padding: 0 !important;
+      }
+
+      /* Tam ekranda butonlar üst kenara yapışmasın */
+      .player-fullscreen-root {
+        position: relative !important;
+      }
+
+      #player-buttons.tam-ekran-butonlari {
+        top: 12px !important;
       }
 
       #player-buttons .p-btn {
@@ -327,16 +301,6 @@ export async function onRequest(context) {
         border: 1px solid rgba(255,255,255,0.06) !important;
       }
 
-      /* TAM EKRAN: butonlar en tepeye yapışmasın, yukarıdan biraz boşluk olsun */
-      :fullscreen #player-buttons {
-        top: 20px !important;
-        ${playerButonKonum === "sol" ? "left: 18px !important;" : "right: 18px !important;"}
-      }
-      :-webkit-full-screen #player-buttons {
-        top: 20px !important;
-        ${playerButonKonum === "sol" ? "left: 18px !important;" : "right: 18px !important;"}
-      }
-
       /* Küçük ekranlarda butonlar biraz daha ufalsın */
       @media (max-width: 480px) {
         #player-buttons .p-btn { padding: 4px 9px !important; gap: 4px !important; border-radius: 11px !important; }
@@ -400,8 +364,6 @@ export async function onRequest(context) {
 
     <div id="player">
 
-      <div id="custom-poster"></div>
-
       <!-- Butonlar -->
       <div id="player-buttons">${butonlarHtml}</div>
 
@@ -421,8 +383,6 @@ export async function onRequest(context) {
 
       const reklamDurum = ${reklamDurum};
 
-      const playerPoster = "${playerPoster}";
-
       let adPlayer = null;
 
       let mainPlayer = null;
@@ -438,38 +398,33 @@ export async function onRequest(context) {
       // ============================================
       function tamEkranButonDuzelt() {
         const btns = document.getElementById("player-buttons");
-        if (!btns) return;
+        const playerEl = document.getElementById("player");
+        if (!btns || !playerEl) return;
+
         const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
+
+        // Önceden eklenen tam ekran sınıfını temizle
+        document.querySelectorAll(".player-fullscreen-root").forEach(function(el) {
+          el.classList.remove("player-fullscreen-root");
+        });
+
         if (fsEl) {
+          fsEl.classList.add("player-fullscreen-root");
           fsEl.appendChild(btns);
+
+          // Tam ekranda ekranın üstünden 12 px boşluk bırak
+          btns.classList.add("tam-ekran-butonlari");
+          btns.style.setProperty("top", "12px", "important");
         } else {
-          document.getElementById("player").appendChild(btns);
+          playerEl.appendChild(btns);
+
+          // Normal görünümde eski 8 px değeri kullanılsın
+          btns.classList.remove("tam-ekran-butonlari");
+          btns.style.setProperty("top", "8px", "important");
         }
       }
       document.addEventListener("fullscreenchange", tamEkranButonDuzelt);
       document.addEventListener("webkitfullscreenchange", tamEkranButonDuzelt);
-
-
-
-      // Kendi poster katmanımızı göster
-
-      function showPoster() {
-
-        if (!playerPoster) return;
-
-        const p = document.getElementById("custom-poster");
-
-        p.style.backgroundImage = "url('" + playerPoster + "')";
-
-        p.style.display = "block";
-
-      }
-
-      function hidePoster() {
-
-        document.getElementById("custom-poster").style.display = "none";
-
-      }
 
 
 
@@ -507,11 +462,9 @@ export async function onRequest(context) {
 
 
 
-        // Yayın oynamaya başlayınca posteri kaldır, boyutu tazele
+        // Yayın oynamaya başlayınca player boyutunu tazele
 
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
-
-          hidePoster();
 
           mainPlayer.resize({ width: "100%", height: "100%" });
 
@@ -558,8 +511,6 @@ export async function onRequest(context) {
 
 
         if (reklamDurum === 1 && reklamVideo && reklamSure > 0) {
-
-          hidePoster();
 
           adPlayer = new Clappr.Player({
 
@@ -638,10 +589,6 @@ export async function onRequest(context) {
           return;
 
         }
-
-
-
-        showPoster(); // yayın gelene kadar arkaplan görünsün
 
 
 
