@@ -371,27 +371,41 @@ function getTema2Html(params) {
   overflow: hidden;
 }
 
-/* Kanal listesi ilk görseldeki gibi panel içinde kaydırılsın */
+/* Maç tarafındaki bütün katmanlar kalan yüksekliği kullansın */
+#live-content .list-area,
+#live-content .bet-matches,
+#live-content .real-matches,
+#live-content .match-tab-box,
+#live-content .match-tab-box > div {
+  height: 100%;
+  min-height: 0;
+}
+
+/* İki liste de aynı eleman üzerinden ve aynı görünümle kaydırılsın */
+#matches-content,
 #channels-content {
   height: 100%;
   max-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-width: thin;
-  scrollbar-color: rgba(255,255,255,.70) rgba(255,255,255,.12);
+  scrollbar-color: rgba(255,255,255,.58) transparent;
 }
 
+#matches-content::-webkit-scrollbar,
 #channels-content::-webkit-scrollbar {
-  width: 8px;
+  width: 2px;
 }
 
+#matches-content::-webkit-scrollbar-track,
 #channels-content::-webkit-scrollbar-track {
-  background: rgba(255,255,255,.12);
+  background: transparent;
 }
 
+#matches-content::-webkit-scrollbar-thumb,
 #channels-content::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,.70);
-  border-radius: 6px;
+  background: rgba(255,255,255,.58);
+  border-radius: 0;
 }
 
 /* MOBIL: tablo playerin altina insin */
