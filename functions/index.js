@@ -57,6 +57,32 @@ export async function onRequest(context) {
     return apiOrigin + "/" + value.replace(/^\/+/, "");
   };
 
+  // Kanal logoları origin domainindeki /img klasöründe duruyor.
+  // Veritabanına yalnızca "beinsports1.png" yazsan da çalışır.
+  // "/img/beinsports1.png" veya tam URL yazarsan da aynen kullanılır.
+  const kanalLogoUrlYap = (deger) => {
+    const value = String(deger || "").trim();
+    if (!value) return "";
+
+    if (/^https?:\/\//i.test(value)) {
+      return value;
+    }
+
+    const temizYol = value.replace(/^\/+/, "");
+
+    if (temizYol.toLowerCase().startsWith("img/")) {
+      return apiOrigin + "/" + temizYol;
+    }
+
+    // İçinde klasör yolu varsa verilen yolu origin altında kullan.
+    if (temizYol.includes("/")) {
+      return apiOrigin + "/" + temizYol;
+    }
+
+    // Sadece dosya adı geldiyse otomatik olarak /img klasörüne ekle.
+    return apiOrigin + "/img/" + temizYol;
+  };
+
   const gorselMi = (deger) => {
     return /\.(webp|png|jpe?g|gif|svg)(?:\?.*)?$/i.test(String(deger || "").trim());
   };
@@ -103,7 +129,7 @@ export async function onRequest(context) {
               || item.player_seo
               || "Kanal"
             ).trim(),
-            img: tamUrlYap(logo),
+            img: kanalLogoUrlYap(logo),
             id: seo,
             m3u8: String(item.player_m3u8 || "").trim()
           };
