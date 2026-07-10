@@ -528,17 +528,33 @@ export async function onRequest(context) {
 
 
 
+          // Reklam kendi süresi doğal olarak biterse ana yayına geç
+
+          adPlayer.on(Clappr.Events.PLAYER_ENDED, function() {
+
+            skipAd();
+
+          });
+
+
+
           const timerDiv = document.getElementById("ad-timer");
 
           const skipBtn = document.getElementById("skip-btn");
 
 
 
+          // player_reklamsure kaç ise, "Reklamı Atla" butonu tam o kadar
+
+          // saniye sonra çıkar. Sabit -5 kaldırıldı.
+
           let remaining = reklamSure;
 
           timerDiv.style.display = "block";
 
-          timerDiv.innerText = "Reklamın bitmesine kalan süre: " + remaining + " saniye";
+          skipBtn.style.display = "none";
+
+          timerDiv.innerText = "Reklamı atlamak için kalan süre: " + remaining + " saniye";
 
 
 
@@ -550,21 +566,15 @@ export async function onRequest(context) {
 
               clearInterval(countdown);
 
-              adPlayer.destroy();
-
-              adPlayer = null;
-
               timerDiv.style.display = "none";
 
-              skipBtn.style.display = "none";
+              // Süre tam dolunca "Reklamı Atla" butonu görünür.
 
-              startMainPlayer(mainUrl);
+              skipBtn.style.display = "block";
 
             } else {
 
-              timerDiv.innerText = "Reklamın bitmesine kalan süre: " + remaining + " saniye";
-
-              if (remaining <= reklamSure - 5) skipBtn.style.display = "block";
+              timerDiv.innerText = "Reklamı atlamak için kalan süre: " + remaining + " saniye";
 
             }
 
