@@ -544,41 +544,65 @@ export async function onRequest(context) {
 
 
 
-          // player_reklamsure kaç ise, "Reklamı Atla" butonu tam o kadar
-
-          // saniye sonra çıkar. Sabit -5 kaldırıldı.
-
-          let remaining = reklamSure;
-
-          timerDiv.style.display = "block";
-
           skipBtn.style.display = "none";
 
-          timerDiv.innerText = "Reklamı atlamak için kalan süre: " + remaining + " saniye";
+          timerDiv.style.display = "none";
 
 
 
-          countdown = setInterval(() => {
+          // Sayaç, reklam GERÇEKTEN oynamaya başlayınca başlar.
 
-            remaining--;
+          // Böylece yükleme/buffer sırasında boşa saymaz.
 
-            if (remaining <= 0) {
+          let sayacBasladi = false;
 
-              clearInterval(countdown);
 
-              timerDiv.style.display = "none";
 
-              // Süre tam dolunca "Reklamı Atla" butonu görünür.
+          function reklamSayaciniBaslat() {
 
-              skipBtn.style.display = "block";
+            if (sayacBasladi) return;   // Yalnızca bir kez başlat
 
-            } else {
+            sayacBasladi = true;
 
-              timerDiv.innerText = "Reklamı atlamak için kalan süre: " + remaining + " saniye";
 
-            }
 
-          }, 1000);
+            let remaining = reklamSure;
+
+            timerDiv.style.display = "block";
+
+            timerDiv.innerText = "Reklamı atlamak için kalan süre: " + remaining + " saniye";
+
+
+
+            countdown = setInterval(() => {
+
+              remaining--;
+
+              if (remaining <= 0) {
+
+                clearInterval(countdown);
+
+                timerDiv.style.display = "none";
+
+                // Süre tam dolunca "Reklamı Atla" butonu görünür.
+
+                skipBtn.style.display = "block";
+
+              } else {
+
+                timerDiv.innerText = "Reklamı atlamak için kalan süre: " + remaining + " saniye";
+
+              }
+
+            }, 1000);
+
+          }
+
+
+
+          // Reklam ilk kez oynamaya başladığında sayacı tetikle.
+
+          adPlayer.on(Clappr.Events.PLAYER_PLAY, reklamSayaciniBaslat);
 
         } else {
 
