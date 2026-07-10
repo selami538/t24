@@ -72,10 +72,8 @@ export async function onRequest(context) {
     "atv": "atv.png",
     "eurosport-1": "eurosport1.png",
     "eurosport-2": "eurosport2.png",
-    "nba": "nba.png",
-    "sky-sports-f1": "skysportsf1.png",
-    "s-sport": "ssport.png",
-    "s-sport-1": "ssport.png",
+    "s-sport": "ssport1.png",
+    "s-sport-1": "ssport1.png",
     "s-sport-2": "ssport2.png",
     "trt-spor": "trtspornew.png",
     "trt-1": "trt1.png"
