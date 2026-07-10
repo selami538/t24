@@ -77,7 +77,7 @@ export async function onRequest(context) {
     "s-sport": "ssport.png",
     "s-sport-1": "ssport.png",
     "s-sport-2": "ssport2.png",
-    "trt-spor": "trtspor.png",
+    "trt-spor": "trtspornew.png",
     "trt-1": "trt1.png"
   };
 
