@@ -57,30 +57,55 @@ export async function onRequest(context) {
     return apiOrigin + "/" + value.replace(/^\/+/, "");
   };
 
-  // Kanal logoları origin domainindeki /img klasöründe duruyor.
-  // Veritabanına yalnızca "beinsports1.png" yazsan da çalışır.
-  // "/img/beinsports1.png" veya tam URL yazarsan da aynen kullanılır.
-  const kanalLogoUrlYap = (deger) => {
-    const value = String(deger || "").trim();
-    if (!value) return "";
+  // Kanal logoları Pages projesinin kökündeki /img klasöründe duruyor.
+  // API'deki kanal_webp / kanal_png alanları boş olsa bile player_seo üzerinden
+  // doğru dosya adı otomatik seçilir.
+  const kanalLogoDosyalari = {
+    "bein-sports-1": "beinsports1.png",
+    "bein-sports-2": "beinsports2.png",
+    "bein-sports-3": "beinsports3.png",
+    "bein-sports-4": "beinsports4.png",
+    "bein-sports-5": "beinsports5.png",
+    "bein-sports-max-1": "beinsportsmax1.png",
+    "bein-sports-max-2": "beinsportsmax2.png",
+    "a-spor": "aspornnew.png",
+    "atv": "atv.png",
+    "eurosport-1": "eurosport1.png",
+    "eurosport-2": "eurosport2.png",
+    "nba": "nba.png",
+    "sky-sports-f1": "skysportsf1.png",
+    "s-sport": "ssport.png",
+    "s-sport-1": "ssport.png",
+    "s-sport-2": "ssport2.png",
+    "trt-spor": "trtspor.png",
+    "trt-1": "trt1.png"
+  };
 
+  const kanalLogoUrlYap = (deger, seo) => {
+    const value = String(deger || "").trim();
+    const kanalSeo = String(seo || "").trim().toLowerCase();
+
+    // API tam URL gönderiyorsa doğrudan kullan.
     if (/^https?:\/\//i.test(value)) {
       return value;
     }
 
-    const temizYol = value.replace(/^\/+/, "");
+    // API /img/dosya.png veya img/dosya.png gönderiyorsa aynı domainde kullan.
+    if (value && /\.(webp|png|jpe?g|gif|svg)(?:\?.*)?$/i.test(value)) {
+      const temizYol = value.replace(/^\/+/, "");
 
-    if (temizYol.toLowerCase().startsWith("img/")) {
-      return apiOrigin + "/" + temizYol;
+      if (temizYol.toLowerCase().startsWith("img/")) {
+        return "/" + temizYol;
+      }
+
+      return "/img/" + temizYol.split("/").pop();
     }
 
-    // İçinde klasör yolu varsa verilen yolu origin altında kullan.
-    if (temizYol.includes("/")) {
-      return apiOrigin + "/" + temizYol;
-    }
+    // API logo alanları boşsa player_seo -> dosya adı eşleşmesini kullan.
+    const dosyaAdi = kanalLogoDosyalari[kanalSeo]
+      || kanalSeo.replace(/[^a-z0-9]/g, "") + ".png";
 
-    // Sadece dosya adı geldiyse otomatik olarak /img klasörüne ekle.
-    return apiOrigin + "/img/" + temizYol;
+    return dosyaAdi ? "/img/" + dosyaAdi : "";
   };
 
   const gorselMi = (deger) => {
@@ -129,7 +154,7 @@ export async function onRequest(context) {
               || item.player_seo
               || "Kanal"
             ).trim(),
-            img: kanalLogoUrlYap(logo),
+            img: kanalLogoUrlYap(logo, seo),
             id: seo,
             m3u8: String(item.player_m3u8 || "").trim()
           };
