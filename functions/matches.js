@@ -20,7 +20,7 @@ export async function onRequest(context) {
   let playerButonKonum = "sag"; // sag = sağ üst, sol = sol üst
 
   // Ekstra buton rengi (panelden ayar_btncolor)
-  let ekstraButonRenk = "#5c1212"; // panelden renk gelmezse görseldeki koyu kırmızı
+  let ekstraButonRenk = "#5c1212"; // panelden renk gelmezse koyu kırmızı
 
   try {
 
@@ -99,7 +99,7 @@ export async function onRequest(context) {
     butonlarHtml += `
         <a class="p-btn p-btn-dark" href="${playerTelegram}" target="_blank" rel="noopener">
           <span class="p-ico-tg">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="13" height="13" fill="#fff"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="11" height="11" fill="#fff"><path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71L12.6 16.3l-1.99 1.93c-.23.23-.42.42-.83.42z"/></svg>
           </span>
           <span class="p-txt">TELEGRAM</span>
         </a>`;
@@ -109,7 +109,7 @@ export async function onRequest(context) {
     butonlarHtml += `
         <a class="p-btn p-btn-dark" href="${playerX}" target="_blank" rel="noopener">
           <span class="p-ico-x">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12" height="12" fill="#fff"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-5.094l-3.97-4.804-4.034 4.804H.448l5.547-6.65L0 .75h5.117l3.595 4.39L12.6.75z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="10" height="10" fill="#fff"><path d="M12.6.75h2.454l-5.36 6.142L16 15.25h-5.094l-3.97-4.804-4.034 4.804H.448l5.547-6.65L0 .75h5.117l3.595 4.39L12.6.75z"/></svg>
           </span>
           <span class="p-txt">X</span>
         </a>`;
@@ -230,82 +230,108 @@ export async function onRequest(context) {
 
 
 
-      /* ===================================== */
-      /* PLAYER ÜSTÜ BUTONLAR (görsele birebir) */
-      /* ===================================== */
+      /* ============================================== */
+      /* PLAYER ÜSTÜ BUTONLAR                           */
+      /* NOT: Tam ekranda butonlar Clappr player'ın     */
+      /* içine taşınıyor ve Clappr'ın kendi CSS'i bizim */
+      /* stilleri eziyordu. Bu yüzden HER ÖZELLİKTE     */
+      /* !important var — tam ekranda da aynı görünsün. */
+      /* ============================================== */
       #player-buttons {
-        position: absolute;
-        top: 8px;
-        ${playerButonKonum === "sol" ? "left: 8px;" : "right: 8px;"}
-        z-index: 2147483647; /* Tam ekranda da en üstte kalsın */
-        display: flex;
-        gap: 8px;
-        align-items: center;
-        font-family: Arial, Helvetica, sans-serif;
+        position: absolute !important;
+        top: 8px !important;
+        ${playerButonKonum === "sol" ? "left: 8px !important; right: auto !important;" : "right: 8px !important; left: auto !important;"}
+        bottom: auto !important;
+        z-index: 2147483647 !important;
+        display: flex !important;
+        gap: 7px !important;
+        align-items: center !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        width: auto !important;
+        height: auto !important;
+        background: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
       }
 
-      .p-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        color: #fff;
-        text-decoration: none;
-        padding: 8px 15px;
-        border-radius: 16px;
-        line-height: 1;
-        white-space: nowrap;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-        transition: transform 0.15s ease, filter 0.15s ease;
+      #player-buttons .p-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 6px !important;
+        color: #fff !important;
+        text-decoration: none !important;
+        padding: 6px 12px !important;      /* Biraz ufaltıldı */
+        border-radius: 14px !important;
+        line-height: 1 !important;
+        white-space: nowrap !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5) !important;
+        width: auto !important;
+        height: auto !important;
+        margin: 0 !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        cursor: pointer !important;
+        transition: transform 0.15s ease, filter 0.15s ease !important;
       }
 
-      .p-btn:hover { transform: scale(1.04); filter: brightness(1.2); }
+      #player-buttons .p-btn:hover {
+        transform: scale(1.04) !important;
+        filter: brightness(1.2) !important;
+      }
 
-      /* Yazı: görseldeki gibi çok kalın + eğik + büyük harf */
-      .p-txt {
-        font-size: 14px;
-        font-weight: 900;
-        font-style: italic;
-        letter-spacing: 0.3px;
-        text-transform: uppercase;
+      /* Yazı: kalın + eğik + büyük harf (biraz ufaltıldı) */
+      #player-buttons .p-txt {
+        font-size: 12px !important;
+        font-weight: 900 !important;
+        font-style: italic !important;
+        letter-spacing: 0.3px !important;
+        text-transform: uppercase !important;
+        color: #fff !important;
+        font-family: Arial, Helvetica, sans-serif !important;
+        line-height: 1 !important;
       }
 
       /* Telegram ve X: simsiyah zemin */
-      .p-btn-dark {
-        background: #0d0d0d;
-        border: 1px solid rgba(255,255,255,0.08);
+      #player-buttons .p-btn-dark {
+        background: #0d0d0d !important;
+        border: 1px solid rgba(255,255,255,0.08) !important;
       }
 
-      /* Telegram'ın mavi yuvarlak ikonu */
-      .p-ico-tg {
-        width: 22px;
-        height: 22px;
-        border-radius: 50%;
-        background: #2AABEE;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+      /* Telegram'ın mavi yuvarlak ikonu (biraz ufaltıldı) */
+      #player-buttons .p-ico-tg {
+        width: 18px !important;
+        height: 18px !important;
+        border-radius: 50% !important;
+        background: #2AABEE !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
 
       /* X ikonu */
-      .p-ico-x {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
+      #player-buttons .p-ico-x {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        padding: 0 !important;
+        margin: 0 !important;
       }
 
       /* Ekstra buton: rengi panelden (ayar_btncolor) */
-      .p-btn-ekstra {
-        background: ${ekstraButonRenk};
-        border: 1px solid rgba(255,255,255,0.06);
+      #player-buttons .p-btn-ekstra {
+        background: ${ekstraButonRenk} !important;
+        border: 1px solid rgba(255,255,255,0.06) !important;
       }
 
-      /* Küçük ekranlarda butonlar biraz ufalsın */
+      /* Küçük ekranlarda butonlar biraz daha ufalsın */
       @media (max-width: 480px) {
-        .p-btn { padding: 5px 10px; gap: 5px; border-radius: 12px; }
-        .p-txt { font-size: 10px; }
-        .p-ico-tg { width: 16px; height: 16px; }
+        #player-buttons .p-btn { padding: 4px 9px !important; gap: 4px !important; border-radius: 11px !important; }
+        #player-buttons .p-txt { font-size: 9px !important; }
+        #player-buttons .p-ico-tg { width: 14px !important; height: 14px !important; }
       }
 
       
