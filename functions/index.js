@@ -204,7 +204,7 @@ function getTema2Html(params) {
 }
 .head-grid .t2-tab.active {
   color: #ffffff !important;
-  border-bottom-color: #49de80;
+  border-bottom-color: transparent;
   background: rgba(255,255,255,.045);
 }
 .head-grid .t2-tab.active .list-blink {
@@ -220,7 +220,7 @@ function getTema2Html(params) {
 .t2-channel-inner::-webkit-scrollbar { display: none; }
 .t2-kanal-kart { flex-shrink: 0; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 12px 20px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; min-width: 160px; height: 72px; }
 .t2-kanal-kart:hover { border-color: rgba(255,255,255,0.3); background: #22263a; }
-.t2-kanal-kart.active { border-color: #49de80; background: #22263a; }
+.t2-kanal-kart.active { border-color: rgba(255,255,255,0.3); background: rgba(255,255,255,0.04); }
 .t2-kanal-kart img { max-height: 42px; max-width: 120px; width: auto; object-fit: contain; }
 .t2-slider-btn { position: absolute; top: 50%; transform: translateY(-50%); border: 1px solid rgba(255,255,255,0.15); color: #fff; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 20px; z-index: 5; transition: all 0.2s; user-select: none; line-height: 1; }
 .t2-slider-btn:hover { background: rgba(255,255,255,0.15); }
