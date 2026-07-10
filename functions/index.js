@@ -173,6 +173,7 @@ export async function onRequest(context) {
     logoheight:   ayar.logo_height || "",
     favicon:      ayar.ayar_favicon || "",
     amp:          ayar.amp_guncel || "",
+    ampAktif:     parseInt(ayar.ayar_amp ?? 0) === 0,
     canlisonuc:   parseInt(ayar.ayar_skor ?? 0),
     twitter:      ayar.ayar_twitter || "",
     telegram:     ayar.ayar_telegram || "",
@@ -222,7 +223,7 @@ export async function onRequest(context) {
 function getTema2Html(params) {
   const {
     hostname, nextDomain, title, description, logo, logowidth, logoheight,
-    favicon, amp, canlisonuc, twitter, telegram, facebook, instagram, youtube,
+    favicon, amp, ampAktif, canlisonuc, twitter, telegram, facebook, instagram, youtube,
     headerapi, bodyapi, footerapi, analyticsapi, apilinkcikisi, pageskincolor,
     footermetin, reklam1, reklam2, reklam3, reklam4, reklam5, reklam6,
     hrefreklam1, hrefreklam2, hrefreklam4, hrefreklam5, hrefreklam6,
@@ -431,7 +432,7 @@ ${analyticsapi}
 ${hrefpageskin
   ? `<a href="${hrefpageskin}" target="_blank" rel="noopener"><div class="sayfa-arka nomobile"></div></a>`
   : `<div class="sayfa-arka nomobile"></div>`}
-<link rel="amphtml" href="${amp}">
+${ampAktif && amp ? `<link rel="amphtml" href="${amp}">` : ''}
 </head>
 <body>
 ${bodyapi}
