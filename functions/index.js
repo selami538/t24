@@ -184,8 +184,6 @@ function getTema2Html(params) {
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
 
-  const jsDegeri = (value) => JSON.stringify(String(value ?? ""));
-
   const varsayilanKanalId = kanallar.length
     ? kanallar[0].id
     : "bein-sports-1";
@@ -195,7 +193,6 @@ function getTema2Html(params) {
         '<div class="t2-kanal-kart' + (index === 0 ? ' active' : '') + '"' +
         ' data-kanal="' + htmlEscape(k.id) + '"' +
         ' data-m3u8="' + htmlEscape(k.m3u8) + '"' +
-        ' onclick="t2KanalSec(' + jsDegeri(k.id) + ', ' + jsDegeri(k.m3u8) + ')"' +
         ' title="' + htmlEscape(k.ad) + '">' +
           (k.img
             ? '<img src="' + htmlEscape(k.img) + '" alt="' + htmlEscape(k.ad) + '" loading="lazy" onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'block\'"/>' +
@@ -418,10 +415,28 @@ nextTab.addEventListener('click', function() {
 t2SekmeAc('maclar');
 document.addEventListener('DOMContentLoaded', function () {
   const searchInput = document.getElementById('matchSearchInput');
-  searchInput.addEventListener('keyup', function () {
-    const filter = this.value.toLowerCase();
-    document.querySelectorAll('.single-match').forEach(function (match) {
-      match.style.display = match.textContent.toLowerCase().includes(filter) ? 'flex' : 'none';
+
+  if (searchInput) {
+    searchInput.addEventListener('keyup', function () {
+      const filter = this.value.toLowerCase();
+
+      document.querySelectorAll('.single-match').forEach(function (match) {
+        match.style.display = match.textContent.toLowerCase().includes(filter)
+          ? 'flex'
+          : 'none';
+      });
+    });
+  }
+
+  // Kanal kartlarına güvenli şekilde tıklama olayı ekle.
+  // Inline onclick içindeki m3u8 çift tırnakları HTML'i bozduğu için
+  // tıklamalar daha önce çalışmıyordu.
+  document.querySelectorAll('.t2-kanal-kart').forEach(function (kart) {
+    kart.addEventListener('click', function () {
+      t2KanalSec(
+        this.getAttribute('data-kanal') || '',
+        this.getAttribute('data-m3u8') || ''
+      );
     });
   });
 });
@@ -443,7 +458,7 @@ function t2KanalSec(id, m3u8) {
     // API'den gelen gerçek m3u8 adresi de iframe üzerinde tutulur.
     iframe.dataset.kanalId = String(id || '');
     iframe.dataset.m3u8 = String(m3u8 || '');
-    iframe.src = 'matches?id=' + encodeURIComponent(id);
+    iframe.src = '/matches?id=' + encodeURIComponent(id);
   }
 }
 </script>
