@@ -646,7 +646,7 @@ fetch('${matchesUrl}')
     }
     document.querySelectorAll('.menu-item').forEach(item => {
       item.addEventListener('click', function () {
-       document.querySelector('.menu-item[data-matchfilter*="Futbol"]')?.classList.add('active');
+      document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
         this.classList.add('active');
         filterMatches(this.getAttribute('data-matchfilter'));
       });
