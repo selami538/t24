@@ -646,12 +646,12 @@ fetch('${matchesUrl}')
     }
     document.querySelectorAll('.menu-item').forEach(item => {
       item.addEventListener('click', function () {
-        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+       document.querySelector('.menu-item[data-matchfilter*="Futbol"]')?.classList.add('active');
         this.classList.add('active');
         filterMatches(this.getAttribute('data-matchfilter'));
       });
     });
-    filterMatches("Futbol,Futbol TR,Football,FutboI,Basketbol,Basketbol TR,BasketboI");
+    filterMatches("Futbol,Futbol TR,Football,FutboI");
   }).catch(e => console.error(e));
 fetch('${channelsUrl}')
   .then(r => r.text()).then(data => {
