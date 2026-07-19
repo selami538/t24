@@ -641,7 +641,7 @@ fetch('${matchesUrl}')
 
     // ayar_macackapa 1 ise sadece TR ve I'li turler kalsin
     const macKapa = ${macKapa ? 'true' : 'false'};
-    const gizliTurler = ['futbol', 'basketbol', 'tenis', 'tennis'];
+    const gizliTurler = ['futbol', 'basketbol', 'tenis', 'tennis', 'voleybol'];
 
     if (macKapa) {
       document.querySelectorAll('#matches-content .single-match').forEach(match => {
