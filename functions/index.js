@@ -166,6 +166,7 @@ export async function onRequest(context) {
   const params = {
     hostname,
     nextDomain,
+    macKapa:      parseInt(ayar.ayar_macackapa ?? 0) === 1,
     title:        ayar.ayar_title || "",
     description:  ayar.ayar_description || "",
     logo:         ayar.ayar_logo || "",
@@ -227,7 +228,7 @@ function getTema2Html(params) {
     headerapi, bodyapi, footerapi, analyticsapi, apilinkcikisi, pageskincolor,
     footermetin, reklam1, reklam2, reklam3, reklam4, reklam5, reklam6,
     hrefreklam1, hrefreklam2, hrefreklam4, hrefreklam5, hrefreklam6,
-    hrefpageskin, menuler, matchesUrl, channelsUrl, kanallar
+    hrefpageskin, menuler, matchesUrl, channelsUrl, kanallar, macKapa
   } = params;
 
   const htmlEscape = (value) => String(value ?? "")
@@ -637,10 +638,22 @@ ${apilinkcikisi}
 fetch('${matchesUrl}')
   .then(r => r.text()).then(data => {
     document.getElementById('matches-content').innerHTML = data;
+
+    // ayar_macackapa 1 ise sadece TR ve I'li turler kalsin
+    const macKapa = ${macKapa ? 'true' : 'false'};
+    const gizliTurler = ['futbol', 'basketbol', 'tenis', 'tennis'];
+
+    if (macKapa) {
+      document.querySelectorAll('#matches-content .single-match').forEach(match => {
+        const type = (match.getAttribute('data-matchtype') || '').toLowerCase().trim();
+        if (gizliTurler.includes(type)) match.remove();
+      });
+    }
+
     function filterMatches(categoryStr) {
       const filters = categoryStr.split(',').map(f => f.trim().toLowerCase());
       document.querySelectorAll("#matches-content .single-match").forEach(match => {
-        const type = match.getAttribute("data-matchtype").toLowerCase();
+        const type = (match.getAttribute("data-matchtype") || "").toLowerCase();
         match.style.display = filters.includes(type) ? "flex" : "none";
       });
     }
