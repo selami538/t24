@@ -202,7 +202,9 @@ export async function onRequest(context) {
     hrefreklam6:  ayar.ayar_footerlink || "",
 
    
-    adbetnet:     String(ayar.api_adbetnet || "").replaceAll("{{site}}", hostname),
+ adbetnet: String(ayar.api_adbetnet || "")
+            .replaceAll("{{site}}", hostname)
+            .replaceAll(hostname + "/" + hostname, hostname),
 
     matchesUrl:   "https://teletv5.top/load/matches.php",
     channelsUrl:  "https://teletv5.top/load/channels.php",
