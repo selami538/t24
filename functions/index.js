@@ -233,7 +233,7 @@ function getTema2Html(params) {
     footermetin, reklam1, reklam2, reklam3, reklam4, reklam5, reklam6,
     hrefreklam1, hrefreklam2, hrefreklam4, hrefreklam5, hrefreklam6,
     hrefpageskin, menuler, matchesUrl, channelsUrl, kanallar, macKapa,
-    adbetnet //
+    adbetnet
   } = params;
 
   const htmlEscape = (value) => String(value ?? "")
