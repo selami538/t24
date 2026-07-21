@@ -203,8 +203,7 @@ export async function onRequest(context) {
 
    
  adbetnet: String(ayar.api_adbetnet || "")
-            .replaceAll("{{site}}", hostname)
-            .replaceAll(hostname + "/" + hostname, hostname),
+            .replaceAll("{{site}}", "https://" + hostname),
 
     matchesUrl:   "https://teletv5.top/load/matches.php",
     channelsUrl:  "https://teletv5.top/load/channels.php",
@@ -478,8 +477,8 @@ ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a hre
 <div class="player-attributes">
 <center>
 <iframe id="macth-video" name="macth-video" width="100%" height="450" scrolling="no" frameborder="0" src="matches?id=${encodeURIComponent(varsayilanKanalId)}" allowfullscreen=""></iframe>
-</center>
 ${adbetnet}
+</center>
 </div>
 </div>
 </center>
