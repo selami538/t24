@@ -184,7 +184,6 @@ export async function onRequest(context) {
     headerapi:    ayar.ayar_api || "",
     bodyapi:      ayar.ayar_body || "",
     footerapi:    ayar.ayar_footervole || "",
-    monetag: ayar.api_monetag || "",
     analyticsapi: ayar.ayar_analystic || "",
     apilinkcikisi:ayar.ayar_linkcikis || "",
     pageskincolor:ayar.ayar_pcolor || "",
@@ -201,10 +200,6 @@ export async function onRequest(context) {
     hrefreklam5:  ayar.ayar_alt2 || "",
     reklam6:      ayar.ayar_reklam4 || "",
     hrefreklam6:  ayar.ayar_footerlink || "",
-
-   
- adbetnet: String(ayar.api_adbetnet || "")
-            .replaceAll("{{site}}", "https://" + hostname),
 
     matchesUrl:   "https://teletv5.top/load/matches.php",
     channelsUrl:  "https://teletv5.top/load/channels.php",
@@ -231,11 +226,10 @@ function getTema2Html(params) {
   const {
     hostname, nextDomain, title, description, logo, logowidth, logoheight,
     favicon, amp, ampAktif, canlisonuc, twitter, telegram, facebook, instagram, youtube,
-    headerapi, bodyapi, footerapi, monetag, analyticsapi, apilinkcikisi, pageskincolor,
+    headerapi, bodyapi, footerapi, analyticsapi, apilinkcikisi, pageskincolor,
     footermetin, reklam1, reklam2, reklam3, reklam4, reklam5, reklam6,
     hrefreklam1, hrefreklam2, hrefreklam4, hrefreklam5, hrefreklam6,
-    hrefpageskin, menuler, matchesUrl, channelsUrl, kanallar, macKapa,
-    adbetnet
+    hrefpageskin, menuler, matchesUrl, channelsUrl, kanallar, macKapa
   } = params;
 
   const htmlEscape = (value) => String(value ?? "")
@@ -436,7 +430,6 @@ function getTema2Html(params) {
 }
 </style>
 ${headerapi}
-${monetag}
 ${analyticsapi}
 ${hrefpageskin
   ? `<a href="${hrefpageskin}" target="_blank" rel="noopener"><div class="sayfa-arka nomobile"></div></a>`
@@ -479,7 +472,6 @@ ${reklam4 ? `<div style="margin:10px;text-align:center;">${hrefreklam4 ? `<a hre
 <div class="player-attributes">
 <center>
 <iframe id="macth-video" name="macth-video" width="100%" height="450" scrolling="no" frameborder="0" src="matches?id=${encodeURIComponent(varsayilanKanalId)}" allowfullscreen=""></iframe>
-${adbetnet}
 </center>
 </div>
 </div>
