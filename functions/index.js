@@ -184,6 +184,7 @@ export async function onRequest(context) {
     headerapi:    ayar.ayar_api || "",
     bodyapi:      ayar.ayar_body || "",
     footerapi:    ayar.ayar_footervole || "",
+    monetag: ayar.api_monetag || "",
     analyticsapi: ayar.ayar_analystic || "",
     apilinkcikisi:ayar.ayar_linkcikis || "",
     pageskincolor:ayar.ayar_pcolor || "",
@@ -225,7 +226,7 @@ function getTema2Html(params) {
   const {
     hostname, nextDomain, title, description, logo, logowidth, logoheight,
     favicon, amp, ampAktif, canlisonuc, twitter, telegram, facebook, instagram, youtube,
-    headerapi, bodyapi, footerapi, analyticsapi, apilinkcikisi, pageskincolor,
+    headerapi, bodyapi, footerapi, monetag, analyticsapi, apilinkcikisi, pageskincolor,
     footermetin, reklam1, reklam2, reklam3, reklam4, reklam5, reklam6,
     hrefreklam1, hrefreklam2, hrefreklam4, hrefreklam5, hrefreklam6,
     hrefpageskin, menuler, matchesUrl, channelsUrl, kanallar, macKapa
@@ -429,6 +430,7 @@ function getTema2Html(params) {
 }
 </style>
 ${headerapi}
+${monetag}
 ${analyticsapi}
 ${hrefpageskin
   ? `<a href="${hrefpageskin}" target="_blank" rel="noopener"><div class="sayfa-arka nomobile"></div></a>`
