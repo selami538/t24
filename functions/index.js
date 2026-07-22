@@ -40,9 +40,20 @@ export async function onRequest(context) {
   }
 
   // ===== TEMA 2 (ve diğerleri) -> Pages'in kendi HTML'i =====
-  const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
-    return String(parseInt(match) + 1);
-  });
+// Sadece domainin ilk parçasındaki (TLD hariç) SON rakam grubunu 1 artır.
+// taraftarium24-244.top -> taraftarium24-245.top
+// taraftarium24-1.top   -> taraftarium24-2.top
+const nextDomainYap = (host) => {
+  const parcalar = host.split(".");
+  // TLD'yi ayır, sadece isim kısmında çalış (örn. "taraftarium24-244")
+  const isim = parcalar[0];
+  const kalan = parcalar.slice(1).join(".");
+
+  const yeniIsim = isim.replace(/(\d+)(?!.*\d)/, (m) => String(parseInt(m, 10) + 1));
+  return kalan ? yeniIsim + "." + kalan : yeniIsim;
+};
+
+const nextDomain = nextDomainYap(hostname);
 
   const ayar = json?.ayar || {};
   const playerlogo = json?.playerlogo || {};
