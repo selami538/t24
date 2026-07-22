@@ -40,9 +40,31 @@ export async function onRequest(context) {
   }
 
   // ===== TEMA 2 (ve diğerleri) -> Pages'in kendi HTML'i =====
-  const nextDomain = hostname.replace(/(\d+)(?!.*\d)/, (match) => {
-    return String(parseInt(match) + 1);
+  // Hesabı Pages proje adresinden değil, ziyaret edilen gerçek alan adından yap.
+  // Örnek: taraftarium24-244.top -> taraftarium24-245.top
+  //         taraftarium24-245.top -> taraftarium24-246.top
+  const hostAdaylari = [
+    request.headers.get("x-forwarded-host"),
+    request.headers.get("host"),
+    hostname
+  ]
+    .filter(Boolean)
+    .map(host => String(host).split(",")[0].trim().replace(/:\d+$/, ""));
+
+  const gercekDomain = hostAdaylari.find(host => {
+    return /^(?:www\.)?taraftarium24-\d+\.top$/i.test(host);
   });
+
+  // Pages önizleme adresinden açılırsa mevcut canlı adresi gösterir.
+  // Gerçek alan adından açıldığında numara tamamen otomatik hesaplanır.
+  const publicHostname = (gercekDomain || "taraftarium24-244.top")
+    .replace(/^www\./i, "");
+
+  const domainNo = Number(
+    publicHostname.match(/^taraftarium24-(\d+)\.top$/i)?.[1]
+  );
+
+  const nextDomain = `taraftarium24-${domainNo + 1}.top`;
 
   const ayar = json?.ayar || {};
   const playerlogo = json?.playerlogo || {};
@@ -164,7 +186,7 @@ export async function onRequest(context) {
     : [];
 
   const params = {
-    hostname,
+    hostname: publicHostname,
     nextDomain,
     macKapa:      parseInt(ayar.ayar_macackapa ?? 0) === 1,
     title:        ayar.ayar_title || "",
