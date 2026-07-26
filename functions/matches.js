@@ -364,13 +364,9 @@ export async function onRequest(context) {
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
         sonUrl = mainUrl;
 
-        // Cache kırıcı: iOS bozuk manifest'i cache'leyip retry'da
-        // aynı hatayı tekrar verebiliyor, taze istek attırıyoruz.
-        const kaynakUrl = mainUrl + (mainUrl.includes("?") ? "&" : "?") + "_r=" + Date.now();
-
         const options = {
 
-          source: kaynakUrl,
+          source: mainUrl,
 
           parentId: "#player",
 
