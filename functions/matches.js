@@ -114,11 +114,55 @@ export async function onRequest(context) {
 
     <meta charset="UTF-8">
 
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
     <style>
 
       html, body { margin: 0; padding: 0; width: 100%; height: 100%; background: #000; overflow: hidden; }
 
-      #player { width: 100%; height: 100vh; position: relative; }
+      #player-shell, #player { width: 100%; height: 100vh; position: relative; }
+
+      #ios-player-container {
+        display: none;
+        position: absolute;
+        inset: 0;
+        z-index: 2;
+        width: 100%;
+        height: 100%;
+        background: #000;
+      }
+
+      #ios-video {
+        width: 100%;
+        height: 100%;
+        background: #000;
+        object-fit: contain;
+      }
+
+      #ios-play-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        background: #000;
+        cursor: pointer;
+      }
+
+      #ios-play-overlay.visible { display: flex; }
+
+      #ios-play-button {
+        width: 76px;
+        height: 76px;
+        padding: 0 0 0 6px;
+        border: 3px solid #fff;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, .7);
+        color: #fff;
+        font-size: 32px;
+        cursor: pointer;
+      }
 
       /* YAYIN EKRANI KÜÇÜLMESİN: Clappr player ve video her zaman tam boy */
 
@@ -138,6 +182,27 @@ export async function onRequest(context) {
 
         object-fit: fill; /* Görüntüyü kesmez ve siyah boşluk bırakmaz (görüntüyü alana göre esnetir) */
 
+      }
+
+      /* iPhone, canlı HLS penceresini 8-12 saniyelik video gibi gösterebilir.
+         Clappr'ın değişen süre bilgisini gizleyip sabit CANLI etiketi göster. */
+      #player [data-player] [data-duration],
+      #player [data-player] .media-control-indicator[data-duration] {
+        display: none !important;
+      }
+
+      #live-badge {
+        position: absolute;
+        left: 12px;
+        bottom: 12px;
+        z-index: 2147483646;
+        padding: 5px 9px;
+        border-radius: 4px;
+        background: rgba(190, 0, 0, .92);
+        color: #fff;
+        font: 700 11px/1 Arial, Helvetica, sans-serif;
+        letter-spacing: .35px;
+        pointer-events: none;
       }
 
       /* ============================================== */
@@ -301,10 +366,20 @@ export async function onRequest(context) {
 
   <body>
 
-    <div id="player">
+    <div id="player-shell">
+
+      <div id="player"></div>
+
+      <div id="ios-player-container">
+        <video id="ios-video" playsinline webkit-playsinline controls x-webkit-airplay="allow"></video>
+        <div id="ios-play-overlay">
+          <button id="ios-play-button" type="button" aria-label="Yayını oynat">▶</button>
+        </div>
+      </div>
 
       <!-- Butonlar -->
       <div id="player-buttons">${butonlarHtml}</div>
+      <div id="live-badge">CANLI</div>
 
     </div>
 
@@ -313,6 +388,13 @@ export async function onRequest(context) {
       const id = "${id}";
 
       let mainPlayer = null;
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const iosPlayerContainer = document.getElementById("ios-player-container");
+      const iosVideo = document.getElementById("ios-video");
+      const iosPlayOverlay = document.getElementById("ios-play-overlay");
+      const clapprPlayerContainer = document.getElementById("player");
+      const liveBadge = document.getElementById("live-badge");
 
       // ============================================
       // HATA / RETRY AYARLARI
@@ -323,6 +405,43 @@ export async function onRequest(context) {
       let retrySayisi = 0;
       const MAX_RETRY = 10;        // En fazla kaç kez denesin
       const RETRY_BEKLEME = 2000;  // Denemeler arası bekleme (ms)
+      let yenidenBaslatmaZamani = null;
+      let oynatmaBasladi = false;
+      let sonVideoZamani = -1;
+      let sonIlerlemeAni = Date.now();
+
+      function playeriYenidenBaslat(neden) {
+        if (!sonUrl || yenidenBaslatmaZamani) return;
+
+        console.warn("Yayın yeniden başlatılıyor:", neden);
+
+        if (retrySayisi >= MAX_RETRY) {
+          console.error("Maksimum deneme sayısına ulaşıldı.");
+          return;
+        }
+
+        retrySayisi++;
+        yenidenBaslatmaZamani = setTimeout(function() {
+          yenidenBaslatmaZamani = null;
+          oynatmaBasladi = false;
+          sonVideoZamani = -1;
+          sonIlerlemeAni = Date.now();
+
+          try {
+            if (mainPlayer) mainPlayer.destroy();
+          } catch (e) {}
+
+          mainPlayer = null;
+
+          if (isIOS && iosVideo) {
+            iosVideo.pause();
+            iosVideo.removeAttribute("src");
+            iosVideo.load();
+          }
+
+          startMainPlayer(sonUrl);
+        }, RETRY_BEKLEME);
+      }
 
       // ============================================
       // TAM EKRAN DÜZELTMESİ:
@@ -331,7 +450,7 @@ export async function onRequest(context) {
       // ============================================
       function tamEkranButonDuzelt() {
         const btns = document.getElementById("player-buttons");
-        const playerEl = document.getElementById("player");
+        const playerEl = document.getElementById("player-shell");
         if (!btns || !playerEl) return;
 
         const fsEl = document.fullscreenElement || document.webkitFullscreenElement;
@@ -359,10 +478,35 @@ export async function onRequest(context) {
       document.addEventListener("fullscreenchange", tamEkranButonDuzelt);
       document.addEventListener("webkitfullscreenchange", tamEkranButonDuzelt);
 
+      function startIOSPlayer(mainUrl) {
+        clapprPlayerContainer.style.display = "none";
+        iosPlayerContainer.style.display = "block";
+        liveBadge.style.display = "none";
+
+        iosVideo.src = mainUrl;
+        iosVideo.load();
+
+        const playPromise = iosVideo.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(function() {
+            iosPlayOverlay.classList.add("visible");
+          });
+        }
+      }
+
       function startMainPlayer(mainUrl) {
 
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
         sonUrl = mainUrl;
+
+        if (isIOS) {
+          startIOSPlayer(mainUrl);
+          return;
+        }
+
+        clapprPlayerContainer.style.display = "block";
+        iosPlayerContainer.style.display = "none";
+        liveBadge.style.display = "block";
 
         const options = {
 
@@ -401,20 +545,7 @@ export async function onRequest(context) {
         mainPlayer.on(Clappr.Events.PLAYER_ERROR, function(err) {
 
           console.warn("Player hatası, yeniden deneniyor:", err);
-
-          if (retrySayisi >= MAX_RETRY) {
-            console.error("Maksimum deneme sayısına ulaşıldı.");
-            return;
-          }
-          retrySayisi++;
-
-          setTimeout(function() {
-            try {
-              if (mainPlayer) mainPlayer.destroy();
-            } catch (e) {}
-            mainPlayer = null;
-            startMainPlayer(sonUrl);
-          }, RETRY_BEKLEME);
+          playeriYenidenBaslat("Clappr hatası");
 
         });
 
@@ -424,6 +555,8 @@ export async function onRequest(context) {
 
           // Başarıyla oynadıysa retry sayacını sıfırla
           retrySayisi = 0;
+          oynatmaBasladi = true;
+          sonIlerlemeAni = Date.now();
 
           // Tarayıcı veya önceki player sessiz bıraktıysa sesi geri aç.
           if (typeof mainPlayer.unmute === "function") {
@@ -446,6 +579,69 @@ export async function onRequest(context) {
 
         if (mainPlayer) mainPlayer.resize({ width: "100%", height: "100%" });
 
+      });
+
+      iosPlayOverlay.addEventListener("click", function() {
+        iosPlayOverlay.classList.remove("visible");
+        const playPromise = iosVideo.play();
+        if (playPromise && typeof playPromise.catch === "function") {
+          playPromise.catch(function() {
+            iosPlayOverlay.classList.add("visible");
+          });
+        }
+      });
+
+      iosVideo.addEventListener("playing", function() {
+        oynatmaBasladi = true;
+        retrySayisi = 0;
+        sonIlerlemeAni = Date.now();
+        iosPlayOverlay.classList.remove("visible");
+      });
+
+      iosVideo.addEventListener("error", function() {
+        playeriYenidenBaslat("iPhone native video hatası");
+      });
+
+      // iOS bazen hata olayı vermeden siyah ekranda/donmuş halde kalır.
+      // Video zamanı 10 saniye ilerlemezse player'ı yeniden kur.
+      setInterval(function() {
+        const video = isIOS ? iosVideo : document.querySelector("#player video");
+        if (!video || !oynatmaBasladi || video.paused || video.ended) return;
+
+        if (Math.abs(video.currentTime - sonVideoZamani) > 0.05) {
+          sonVideoZamani = video.currentTime;
+          sonIlerlemeAni = Date.now();
+          return;
+        }
+
+        if (Date.now() - sonIlerlemeAni > 10000) {
+          playeriYenidenBaslat("iOS görüntüsü ilerlemedi");
+        }
+      }, 2000);
+
+      // Safari arka plandan geri gelince HLS bağlantısını tekrar uyandır.
+      document.addEventListener("visibilitychange", function() {
+        if (document.visibilityState !== "visible") return;
+
+        const video = isIOS ? iosVideo : document.querySelector("#player video");
+        if (!video) {
+          playeriYenidenBaslat("sayfaya dönüşte video bulunamadı");
+          return;
+        }
+
+        if (video.readyState < 2 || video.networkState === 3) {
+          playeriYenidenBaslat("sayfaya dönüşte yayın hazır değil");
+          return;
+        }
+
+        if (oynatmaBasladi && video.paused) {
+          const playPromise = video.play();
+          if (playPromise && typeof playPromise.catch === "function") {
+            playPromise.catch(function() {
+              playeriYenidenBaslat("sayfaya dönüşte oynatma başlamadı");
+            });
+          }
+        }
       });
 
       async function loadStream(id) {
