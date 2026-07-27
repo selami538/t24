@@ -324,31 +324,10 @@ export async function onRequest(context) {
       const MAX_RETRY = 10;        // En fazla kaç kez denesin
       const RETRY_BEKLEME = 2000;  // Denemeler arası bekleme (ms)
 
-      // Stall (takılma) kurtarma zamanlayıcısı
-      let stallZamanlayici = null;
-
-      // iOS tespiti (iPadOS masaüstü modu dahil)
-      const IOS_MU = /iPad|iPhone|iPod/.test(navigator.userAgent) ||
-        (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-      // ============================================
-      // PLAYER'I YIK VE YENİDEN KUR (ortak fonksiyon)
-      // ============================================
-      function playerYenidenKur() {
-        if (!sonUrl) return;
-        try {
-          if (mainPlayer) mainPlayer.destroy();
-        } catch (e) {}
-        mainPlayer = null;
-        startMainPlayer(sonUrl);
-      }
-
       // ============================================
       // TAM EKRAN DÜZELTMESİ:
       // Tam ekrana geçince butonları tam ekran olan
       // elemanın içine taşı, çıkınca geri getir.
-      // (iOS'ta çalışmaz — iOS native video tam ekranı
-      // kullanır ve HTML butonlar orada görünemez.)
       // ============================================
       function tamEkranButonDuzelt() {
         const btns = document.getElementById("player-buttons");
@@ -380,29 +359,6 @@ export async function onRequest(context) {
       document.addEventListener("fullscreenchange", tamEkranButonDuzelt);
       document.addEventListener("webkitfullscreenchange", tamEkranButonDuzelt);
 
-      // ============================================
-      // iOS SEKMEYE GERİ DÖNÜŞ KURTARMASI:
-      // Safari arka plana atılıp geri gelince veya
-      // native tam ekrandan çıkınca HLS bağlantısı
-      // ölmüş olabilir → siyah ekran. Burada kontrol
-      // edip gerekirse player'ı yeniden kuruyoruz.
-      // ============================================
-      document.addEventListener("visibilitychange", function() {
-        if (document.visibilityState !== "visible" || !mainPlayer) return;
-
-        setTimeout(function() {
-          const video = document.querySelector("#player video");
-
-          if (!video || video.error || video.readyState < 2) {
-            // Video ölmüş / takılmış → sıfırdan kur
-            playerYenidenKur();
-          } else if (video.paused) {
-            // Sadece durmuş → devam ettir
-            try { mainPlayer.play(); } catch (e) {}
-          }
-        }, 500);
-      });
-
       function startMainPlayer(mainUrl) {
 
         mainUrl = mainUrl.replace(/edge4\\./g, "edge3.");
@@ -426,9 +382,7 @@ export async function onRequest(context) {
 
           mimeType: "application/x-mpegURL",
 
-          playback: {
-            playInline: true // iOS: video native tam ekrana zorla atlamasın
-          }
+          playback: { playInline: true } // iOS: video native tam ekrana zorla atlamasın
 
         };
 
@@ -439,54 +393,6 @@ export async function onRequest(context) {
         ${playerLogoyer ? `options.position = "${playerLogoyer}";` : ""}
 
         mainPlayer = new Clappr.Player(options);
-
-        // ============================================
-        // iOS DÜZELTMELERİ:
-        // 1) playsinline attribute'unu video etiketine
-        //    garanti olarak bas (Clappr bazen basmıyor,
-        //    o zaman iOS tam ekran giriş/çıkışta HLS
-        //    oturumunu koparıyor → siyah ekran).
-        // 2) iOS native tam ekran çıkış olayı document'te
-        //    değil VIDEO elementinde tetiklenir
-        //    (webkitendfullscreen). Çıkışta video durur;
-        //    burada yakalayıp devam ettiriyoruz.
-        // ============================================
-        mainPlayer.on(Clappr.Events.PLAYER_READY, function() {
-
-          const video = document.querySelector("#player video");
-          if (!video) return;
-
-          video.setAttribute("playsinline", "");
-          video.setAttribute("webkit-playsinline", "");
-
-          if (IOS_MU) {
-
-            // iOS native tam ekrandan ÇIKINCA
-            video.addEventListener("webkitendfullscreen", function() {
-              setTimeout(function() {
-                if (!mainPlayer) return;
-
-                const v = document.querySelector("#player video");
-
-                if (!v || v.error || v.readyState < 2) {
-                  // Yayın kopmuş → yeniden kur
-                  playerYenidenKur();
-                } else {
-                  // Sadece duraklamış → devam ettir + boyut tazele
-                  try { mainPlayer.play(); } catch (e) {}
-                  mainPlayer.resize({ width: "100%", height: "100%" });
-                }
-              }, 400);
-            });
-
-            // iOS native tam ekrana GİRİNCE bir şey yapmaya gerek yok,
-            // ama takılırsa diye stall zamanlayıcısını temizleyelim.
-            video.addEventListener("webkitbeginfullscreen", function() {
-              clearTimeout(stallZamanlayici);
-            });
-          }
-
-        });
 
         // ============================================
         // HATA YAKALA (error code 3 dahil):
@@ -502,30 +408,13 @@ export async function onRequest(context) {
           }
           retrySayisi++;
 
-          setTimeout(playerYenidenKur, RETRY_BEKLEME);
-
-        });
-
-        // ============================================
-        // TAKILMA (STALL) KURTARMASI:
-        // iOS'ta hata bazen PLAYER_ERROR yerine sessiz
-        // bir takılma olarak gelir. 8 sn takılı kalırsa
-        // player'ı yeniden kur.
-        // ============================================
-        mainPlayer.on(Clappr.Events.PLAYBACK_STALLED, function() {
-
-          clearTimeout(stallZamanlayici);
-
-          stallZamanlayici = setTimeout(function() {
-
-            console.warn("Yayın takıldı, yeniden kuruluyor...");
-
-            if (retrySayisi >= MAX_RETRY) return;
-            retrySayisi++;
-
-            playerYenidenKur();
-
-          }, 8000);
+          setTimeout(function() {
+            try {
+              if (mainPlayer) mainPlayer.destroy();
+            } catch (e) {}
+            mainPlayer = null;
+            startMainPlayer(sonUrl);
+          }, RETRY_BEKLEME);
 
         });
 
@@ -533,9 +422,8 @@ export async function onRequest(context) {
 
         mainPlayer.on(Clappr.Events.PLAYER_PLAY, function() {
 
-          // Başarıyla oynadıysa retry sayacını ve stall'ı sıfırla
+          // Başarıyla oynadıysa retry sayacını sıfırla
           retrySayisi = 0;
-          clearTimeout(stallZamanlayici);
 
           // Tarayıcı veya önceki player sessiz bıraktıysa sesi geri aç.
           if (typeof mainPlayer.unmute === "function") {
