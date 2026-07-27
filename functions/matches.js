@@ -291,11 +291,9 @@ export async function onRequest(context) {
 
     </style>
 
-    <script src="https://cdn.jsdelivr.net/npm/@clappr/player@latest/dist/clappr.min.js"></script>
-
-    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
-    <script src="/assets/js/clappr.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@clappr/player@0.11.16/dist/clappr.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@clappr/hlsjs-playback@1.8.3/dist/hlsjs-playback.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/level-selector/dist/level-selector.min.js"></script>
 
   </head>
 
