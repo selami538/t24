@@ -291,6 +291,7 @@ function getTema2Html(params) {
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${description}" />
 <meta property="og:type" content="website" />
+<meta name="yandex" content="noindex, nofollow">
 <link rel="shortcut icon" href="${favicon}" type="image/x-icon" />
 <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
 <link rel="stylesheet" href="assets/css/jquery.fancybox.min.css" />
