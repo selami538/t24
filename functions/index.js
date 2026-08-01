@@ -451,6 +451,26 @@ function getTema2Html(params) {
     min-height: 450px;
   }
 }
+.hellobar {
+    background: var(--bg-glass);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    color: #fff;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    max-width: 1100px;
+    width: 100%;
+    margin: 1.5rem 0;
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(6, 182, 212, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: visible;
+}
 </style>
 ${headerapi}
 ${analyticsapi}
