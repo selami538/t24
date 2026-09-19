@@ -1,10 +1,15 @@
 export async function onRequest(context) {
   const { request } = context;
-  const baseUrl = request.headers.get("X-Public-Origin") || new URL(request.url).origin;
+  const baseUrl =
+    request.headers.get("X-Public-Origin") || new URL(request.url).origin;
 
   const content = `
+User-agent: Yandex
+Disallow: /
+
 User-agent: *
 Allow: /
+
 Sitemap: ${baseUrl}/sitemap.xml
 `;
 
