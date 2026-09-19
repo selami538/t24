@@ -509,7 +509,6 @@ ${analyticsapi}
 ${hrefpageskin
   ? `<a href="${hrefpageskin}" target="_blank" rel="noopener"><div class="sayfa-arka nomobile"></div></a>`
   : `<div class="sayfa-arka nomobile"></div>`}
-<meta name="yandex" content="noindex, nofollow">
 ${ampAktif && amp ? `<link rel="amphtml" href="${amp}">` : ''}
 </head>
 <body>
