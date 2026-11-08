@@ -559,6 +559,34 @@ ${textreklam ? `
             : `<span>${textreklam}</span>`}
     </div>
 ` : ''}
+<!-- TÜRKİYE YAYIN DUYURUSU -->
+<div class="yayin-duyuru">
+  🇹🇷 Özel maç yayınları yalnızca Türkiye'den izlenebilir.
+</div>
+
+<style>
+.yayin-duyuru {
+  max-width: 1100px;
+  margin: 10px auto;
+  padding: 11px 15px;
+  background: #202633;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 7px;
+  color: #fff;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .yayin-duyuru {
+    margin: 8px 10px;
+    padding: 10px;
+    font-size: 12px;
+  }
+}
+</style>
+<!-- TÜRKİYE YAYIN DUYURUSU BİTİŞ -->
 <div class="container-grid player-grid">
 <center>
 <div class="live-player" data-loadbalancer="1" data-loadbalancerdomain="osflare.work">
